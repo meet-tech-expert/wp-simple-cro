@@ -10,7 +10,7 @@
 
     registerBlockType( 'simple-cro/block', {
         title: __( 'Simple CRO', 'wp-simple-cro' ),
-        icon: 'admin-tools',
+        icon: 'admin-settings',
         category: 'layout',
         className: 'simple-cro',
 
