@@ -121,6 +121,12 @@ class Wp_Simple_Cro {
 		 * side of the site.
 		 */
 		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'public/class-wp-simple-cro-public.php';
+		
+		/** 
+		 * The class responsible for handling custom post type functionality.
+		 */
+		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/class-wp-simple-cro-cpt.php';
+
 
 		$this->loader = new Wp_Simple_Cro_Loader();
 
@@ -152,11 +158,11 @@ class Wp_Simple_Cro {
 	 */
 	private function define_admin_hooks() {
 
-		$plugin_admin = new Wp_Simple_Cro_Admin( $this->get_plugin_name(), $this->get_version() );
+		$plugin_admin = new Wp_Simple_Cro_Admin( $this->get_plugin_name(), $this->get_version() );		
+		$wp_simple_cro_cpt = new Wp_Simple_CRO_CPT( $this->get_plugin_name(), $this->get_version() );
 
 		$this->loader->add_action( 'admin_enqueue_scripts', $plugin_admin, 'enqueue_styles' );
 		$this->loader->add_action( 'admin_enqueue_scripts', $plugin_admin, 'enqueue_scripts' );
-
 	}
 
 	/**

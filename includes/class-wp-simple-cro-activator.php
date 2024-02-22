@@ -31,6 +31,13 @@ class Wp_Simple_Cro_Activator {
 	 */
 	public static function activate() {
 
+		//Check custom post type simple_cro exist
+
+		if(post_type_exists( SIMPLE_CRO_CPT )){
+
+		}
+
+
 	}
 
 }

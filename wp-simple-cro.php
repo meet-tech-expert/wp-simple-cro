@@ -36,6 +36,8 @@ if ( ! defined( 'WPINC' ) ) {
  * Rename this for your plugin and update it as you release new versions.
  */
 define( 'WP_SIMPLE_CRO_VERSION', '1.0.0' );
+//Custom Post Type Constant
+define( 'SIMPLE_CRO_CPT', 'simple_cro' );
 
 /**
  * The code that runs during plugin activation.

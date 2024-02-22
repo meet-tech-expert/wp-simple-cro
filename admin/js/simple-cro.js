@@ -7,6 +7,7 @@
     var Button = wp.components.Button;
     var TextControl = wp.components.TextControl;
     var RangeControl = wp.components.RangeControl;
+    var PanelBody = wp.components.PanelBody;
 
     registerBlockType( 'simple-cro/block', {
         title: __( 'Simple CRO', 'wp-simple-cro' ),
@@ -40,30 +41,29 @@
         edit: function( props ) {
             const { attributes, setAttributes } = props;
             const { isNewCRO } = attributes;
-
+        
             const handleNewButtonClick = () => {
                 setAttributes({ isNewCRO: true });
             };
-
+        
             const handleExistingButtonClick = () => {
                 setAttributes({ isNewCRO: false });
             };
-
-            return [
-               
+        
+            return [               
                 // Buttons to switch between New CRO and Existing CRO
                 el(
                     'div',
                     { className: 'simple-cro-buttons' },
                     el(
                         'h3',
-                        { className: props.className },
-                        ' Simple CRO',
-                    ),
-                    el(
+                        null,
+                        'Simple CRO',
+                    ),                    
+                    el( 
                         'p',
-                        { className: props.className },
-                        ' Simplify Gutenberg block testing with the Simple CRO',
+                        null,
+                        'Simplify Gutenberg block testing with the Simple CRO'
                     ),
                     el( Button, {
                         isPrimary: isNewCRO,
@@ -109,8 +109,9 @@
                         } )
                     )
                 )
-            ];            
+            ];
         },
+        
 
         save: () => {
             return null; // No content saved on the front end

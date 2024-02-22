@@ -71,35 +71,9 @@ class Wp_Simple_Cro_Admin {
 	 * @since    1.0.0
 	 */
 	public function enqueue_scripts() {
-		wp_enqueue_script( 
-			$this->plugin_name, 
-			plugin_dir_url( __FILE__ ) . 'js/wp-simple-cro-admin.js', 
-			array('jQuery'), 
-			$this->version, 
-			false 
-		);
-		wp_enqueue_script( 
-			'simple-cro-gutenberg', 
-			plugin_dir_url( __FILE__ ) . 'js/simple-cro.js', 
-			array('wp-blocks', 'wp-editor'), 
-			$this->version, 
-			true 
-		);
-	
-		// Localize script for translation
-		wp_localize_script(
-			$this->plugin_name,
-			'simpleCroBlock', // Handle to access localized data in JavaScript
-			array(
-				'ajax_url' => admin_url( 'admin-ajax.php' ), // Example of localized data
-			)
-		);
-	
-		// Set script translations
-		wp_set_script_translations( 
-			'wp-simple-cro-admin', 
-			'wp-simple-cro', 
-			plugin_dir_path( __FILE__ ) . 'languages' 
-		);
+		wp_enqueue_script($this->plugin_name,plugin_dir_url( __FILE__ ) . 'js/wp-simple-cro-admin.js',array('jQuery'),$this->version,false);
+		wp_enqueue_script('simple-cro-gutenberg',plugin_dir_url( __FILE__ ) . 'js/simple-cro.js',array('wp-blocks', 'wp-editor'),$this->version,true);
+		wp_localize_script($this->plugin_name,'simpleCroBlock',array('ajax_url' => admin_url( 'admin-ajax.php' )));
+		wp_set_script_translations('wp-simple-cro-admin','wp-simple-cro',plugin_dir_path( __FILE__ ) . 'languages');
 	}
 }
