@@ -31,13 +31,11 @@ class Wp_Simple_Cro_Activator {
 	 */
 	public static function activate() {
 
-		//Check custom post type simple_cro exist
-
-		if(post_type_exists( SIMPLE_CRO_CPT )){
-
-		}
-
-
-	}
+		// Check if custom post type simple_cro exists
+		if (post_type_exists(SIMPLE_CRO_CPT)) {
+			cro_admin_notice(SIMPLE_CRO_CPT . 'is already exists', 'error');
+			deactivate_plugins(plugin_basename(__FILE__));
+		}		
+	}	
 
 }

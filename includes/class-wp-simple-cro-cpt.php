@@ -34,12 +34,11 @@ class Wp_Simple_CRO_CPT {
     public function __construct( $plugin_name, $version ) {
 
 		$this->plugin_name = $plugin_name;
-		$this->version = $version;
-        add_action( 'init',  array( $this,'register_simple_cro_cpt') );	
+		$this->version = $version;       
+        // Hook the methods properly
+        add_action( 'init', array( $this, 'register_simple_cro_cpt' ) );
 	}
 
-    // Register the custom post type
-    
     public function register_simple_cro_cpt() {
 
         $labels = array(
@@ -70,15 +69,19 @@ class Wp_Simple_CRO_CPT {
             'items_list'            => esc_html__( 'Simple CRO list', $this->plugin_name ),
             'items_list_navigation' => esc_html__( 'Simple CRO list navigation', $this->plugin_name ),
             'filter_items_list'     => esc_html__( 'Filter Simple CRO list', $this->plugin_name ),
-        );
+            'item_published'        => esc_html__( 'Simple CRO published', $this->plugin_name ),
+            'item_published_privately' => esc_html__( 'Simple CRO published privately', $this->plugin_name ),
+            'item_reverted_to_draft' => esc_html__( 'Simple CRO reverted to draft', $this->plugin_name ),
+            'item_scheduled'        => esc_html__( 'Simple CRO scheduled', $this->plugin_name ),
+            'item_updated'          => esc_html__( 'Simple CRO updated', $this->plugin_name ),
+        );        
         $args = array(
-            'label'                 => esc_html__( 'Simple CRO ', $this->plugin_name ),
-            'description'           => esc_html__( 'Simple CRO ', $this->plugin_name ),
+            'label'                 => esc_html__( 'Simple CRO', $this->plugin_name ),
+            'description'           => esc_html__( 'Simple CRO', $this->plugin_name ),
             'labels'                => $labels,
             'supports'              => array( 'title', 'editor', 'custom-fields' ),
-            'hierarchical'          => false,
+            'show_in_rest'          => true,
             'public'                => true,
-            'show_ui'               => true,
             'show_in_menu'          => true,
             'menu_position'         => 5,
             'menu_icon'             => 'dashicons-layout',
@@ -89,9 +92,13 @@ class Wp_Simple_CRO_CPT {
             'exclude_from_search'   => false,
             'publicly_queryable'    => true,
             'capability_type'       => 'post',
-        );
-
-        register_post_type( SIMPLE_CRO_CPT, $args );
+            'rewrite'               => array( 'slug' => 'simple-cro', 'with_front' => true ),
+            'show_ui'               => true,
+        );  
+        $cro_cpt = register_post_type( SIMPLE_CRO_CPT, $args );
+        
+        if ( is_wp_error( $cro_cpt ) ) {
+            cro_admin_notice('Failed to register '.SIMPLE_CRO_CPT. ' post type '. $cro_cpt->get_error_message() , 'error');
+        }      
     }
-
 }

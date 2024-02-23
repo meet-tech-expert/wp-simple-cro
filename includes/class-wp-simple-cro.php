@@ -127,6 +127,8 @@ class Wp_Simple_Cro {
 		 */
 		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/class-wp-simple-cro-cpt.php';
 
+		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/wp-simple-cro-functions.php';
+
 
 		$this->loader = new Wp_Simple_Cro_Loader();
 
