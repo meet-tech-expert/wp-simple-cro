@@ -21,6 +21,18 @@
                 type: 'boolean',
                 default: false
             },
+            isExitsCRO: {
+                type: 'boolean',
+                default: false
+            },
+            selectedCRO: {
+                type: 'string',
+                default: ''
+            },
+            selectedPostContent:{
+                type: 'string',
+                default: ''
+            },
             croTestTitle: {
                 type: 'string',
                 default: ''
@@ -40,18 +52,37 @@
         },
 
         edit: function( props ) {
-            const { attributes, setAttributes } = props;
-            const { isNewCRO } = attributes;
-        
+            const { attributes, setAttributes } = props;            
+            const { isNewCRO, isExitsCRO, selectedCRO, selectedPostContent} = attributes;
+
             const handleNewButtonClick = () => {
-                setAttributes({ isNewCRO: true });
+                setAttributes({ isNewCRO: true, isExitsCRO: false });
             };
-        
+
             const handleExistingButtonClick = () => {
-                setAttributes({ isNewCRO: false });
+                setAttributes({ isExitsCRO: true, isNewCRO: false });
             };
-        
-            return [               
+
+            const handlePostSelectChange = (event) => {
+                const newValue = event.target.value;
+                setAttributes({ selectedCRO: newValue });
+            
+                // Find the selected post based on the ID
+                const selectedPost = window.simpleCroBlock.posts.find(post => post.ID === parseInt(newValue));
+                
+                if (selectedPost) {
+                    // Access the content of the selected post
+                    const postContent = selectedPost.post_content;
+                    // Set the selected post content and block type as attributes
+                    setAttributes({ selectedPostContent: postContent});              
+                }      
+                console.log('selectedPost:', selectedPost);
+          
+            };
+            const SelectedOptions = window.simpleCroBlock && window.simpleCroBlock.posts && window.simpleCroBlock.posts.length > 0
+            ? window.simpleCroBlock.posts.map(post => el('option', { key: post.ID, value: post.ID }, post.post_title))
+            : [];
+            return [
                 // Buttons to switch between New CRO and Existing CRO
                 el(
                     'div',
@@ -59,7 +90,7 @@
                     el(
                         'h3',
                         null,
-                        'Simple CRO',
+                        'Simple CRO'
                     ),                    
                     el( 
                         'p',
@@ -71,16 +102,38 @@
                         onClick: handleNewButtonClick,
                     }, 'New CRO' ),
                     el( Button, {
-                        isPrimary: !isNewCRO,
+                        isPrimary: isExitsCRO,
                         onClick: handleExistingButtonClick,
-                    }, 'Existing CRO' )
-                ),
-               
+                    }, 'Existing CRO'),
+                ),     
+                isExitsCRO && el(
+                    InspectorControls,
+                    null,
+                    el(
+                        PanelBody,
+                        { title: 'Simple CRO Select' },
+                        el(
+                            'div',
+                            { className: 'simple-cro-post-select' },
+                            el(
+                                'select',
+                                { value: selectedCRO, onChange: handlePostSelectChange },
+                                el(
+                                    'option',
+                                    { value: '' },
+                                    'Select a Post'
+                                ),
+                                SelectedOptions
+                            ),
+                        ),
+                    )
+                ),                                                  
                 isNewCRO && el(
                     'div',
                     { className: 'simple-cro-editor' }, 
                     el( InnerBlocks, { allowedBlocks: [ 'core/paragraph', 'core/image', 'core/audio' ] } ),
-                    
+                    // Select dropdown for existing CRO
+           
                     // Options panel in the right sidebar
                     el(
                         InspectorControls,
@@ -116,17 +169,29 @@
                             } )
                         )
                     )
-                )];
-        },
-        
-
-        save: function( props ) {
-            return (
-                el( 'div', { className: 'simple-cro-wrapper' },
-                    el( InnerBlocks.Content )
                 )
-            );
-        }        
-    } );
+            ]},
+
+            save: function( props ) {
+                const { isNewCRO, isExitsCRO, selectedPostContent } = props.attributes;
+            
+                // If it's a new CRO, render only the InnerBlocks content
+                if (isNewCRO) {
+                    return (
+                        el( 'div', { className: 'simple-cro-wrapper' },
+                            el( InnerBlocks.Content )
+                        )
+                    );
+                } else {
+                    // Otherwise, render the selected post content
+                    return (
+                        el( 'div', { className: 'simple-cro-wrapper' },
+                            el( 'div', { className: 'selected-post-content', dangerouslySetInnerHTML: { __html: selectedPostContent } } )
+                        )
+                    );
+                }
+            }
+                     
+    });  
     
-})( jQuery );
+})( jQuery );          
