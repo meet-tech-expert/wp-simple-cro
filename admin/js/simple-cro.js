@@ -15,8 +15,9 @@
 
         registerBlockType( 'simple-cro/block', {
             title: __( 'Simple CRO', 'wp-simple-cro' ),
+            description: __( 'A simple CRO description','wp-simple-cro' ),
             icon: 'admin-page',
-            category: 'layout',
+            category: 'widgets',
             className: 'simple-cro',
 
             attributes: {
@@ -109,21 +110,32 @@
                 return [
                     el(
                         'div',
-                        { className: 'simple-cro-blocks' },
+                        { className: 'simple-cro-blocks components-placeholder is-large' },
                         el(
-                            'h3',
-                            null,
-                            'Simple CRO'
+                            'div',
+                            { className: 'components-placeholder__label' }, 
+                            el(
+                                'span',
+                                {className: 'dashicon dashicons dashicons-admin-page'}
+                            ),
+                            'Simple CRO',
+                            
+                        ),
+                        !isNewCRO && !isExistCRO && el( 
+                            'div',
+                            { className: 'components-placeholder__instructions' },
+                            'A simple CRO description'
                         ),
                         !isNewCRO && !isExistCRO && el(
                             'div',
-                            { className: 'simple-cro-buttons' },
+                            { className: 'simple-cro-buttons components-placeholder__fieldset' },
                         el( Button, {
-                            isPrimary: isNewCRO,
+                            className: 'primary',
+                            isPrimary: true,
                             onClick: handleNewButtonClick,
                         }, 'New CRO' ),
                         el( Button, {
-                            isPrimary: isExistCRO,
+                            isSecondary: true,
                             onClick: handleExistingButtonClick,
                         }, 'Existing CRO')
                         ),
@@ -154,8 +166,7 @@
                     isNewCRO && el(
                         'div',
                         { className: 'simple-cro-editor' }, 
-                        el( InnerBlocks, { allowedBlocks:true } ),
-            
+                        el( InnerBlocks, { allowedBlocks: true } ),
                         el(
                             InspectorControls,
                             null,
@@ -227,13 +238,9 @@
                             )
                         )
                     ),
-                    el(
-                        'div',
-                        null,                        
-                        selectedPostContent && el(
-                             'div',
-                             { className: 'simple-cro-content', dangerouslySetInnerHTML: { __html: selectedPostContent }} 
-                             ),
+                    selectedPostContent && el(
+                            'div',
+                            { className: 'simple-cro-content', dangerouslySetInnerHTML: { __html: selectedPostContent }}
                     ),
             ]},
 
