@@ -72,7 +72,7 @@ class Wp_Simple_Cro_Admin {
 	 */
 	public function enqueue_scripts() {
 		wp_enqueue_script($this->plugin_name, plugin_dir_url(__FILE__) . 'js/wp-simple-cro-admin.js', array('jquery'), $this->version, false);
-		wp_enqueue_script('simple-cro-gutenberg', plugin_dir_url(__FILE__) . 'js/simple-cro.js', array('wp-blocks', 'wp-element', 'wp-editor', 'wp-components', 'wp-i18n'), $this->version, true);
+		wp_enqueue_script('simple-cro-gutenberg', plugin_dir_url(__FILE__) . 'js/simple-cro.js', array('wp-blocks', 'wp-i18n', 'wp-element', 'wp-components', 'wp-editor'), $this->version, true);
 		wp_localize_script('simple-cro-gutenberg', 'simpleCroBlock', array('ajax_url' => admin_url('admin-ajax.php'), 'posts' => get_posts(array('post_type' => 'simple_cro', 'posts_per_page' => -1))));
 		wp_set_script_translations('wp-simple-cro-admin', 'wp-simple-cro', plugin_dir_path(__FILE__) . 'languages');
 	}
