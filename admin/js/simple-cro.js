@@ -90,14 +90,11 @@
                 const handlePostSelectChange = (event) => {
                     const newValue = event.target.value;
                     setAttributes({ selectedCRO: newValue });
-                    console.log(newValue);
+                    //console.log(newValue);
                     // Make a request to the WordPress REST API to fetch post content
                     fetch(`/wp-json/wp/v2/simple_cro/${newValue}`)
                         .then(response => {
-                            // console.log(response);
-
                             if (response.ok) {
-                                // console.log(response.json());
                                 return response.json();
                             } else {
                                 throw new Error('Failed to fetch post content');
@@ -106,8 +103,13 @@
                         .then(post => {
                             // Access the content of the selected post
                             const postContent = post.content.rendered;
-                            // Set the selected post content as attributes
+                            // // Set the selected post content as attributes
                             setAttributes({ selectedPostContent: postContent }); 
+                            setAttributes( { croTitle: $(post.content.rendered).data('title') } )
+                            setAttributes( { croCat: $(post.content.rendered).data('cat') } )
+                            setAttributes( { croTags: $(post.content.rendered).data('tags') } )
+                            setAttributes( { croUniqueId: $(post.content.rendered).data('id') } )
+                            setAttributes( { croSlider: $(post.content.rendered).data('slider') } )
                         })
                         .catch(error => {
                             console.error('Error fetching post content:', error);
@@ -257,12 +259,12 @@
             ]},          
             save: function(props) {
 
-                const { croTitle, croCat , croBlock1Title, croTags, croUniqueId, croBlock1UniqueId, croBlock2Title, croBlock2UniqueId , selectedPostContent} = props.attributes;
+                const { croTitle, croCat , croBlock1Title, croTags, croUniqueId,croSlider, croBlock1UniqueId, croBlock2Title, croBlock2UniqueId , selectedPostContent} = props.attributes;
             
                 return (
                     el(
                         'div',
-                        { className: 'simple-cro-wrapper', title: croTitle, 'data-cat': croCat, 'crotags': croTags, 'id': croUniqueId },
+                        { className: 'simple-cro-wrapper', 'data-title': croTitle, 'data-cat': croCat, 'data-tags': croTags, 'data-id': croUniqueId, 'data-slider': croSlider },
                         el(wp.blockEditor.InnerBlocks.Content),
                         selectedPostContent && el(
                             'div',
