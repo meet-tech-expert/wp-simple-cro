@@ -1,0 +1,19 @@
+.cro-block-distribution .components-input-control__container{
+    display: none !important;
+}
+.cro-block-distribution .cro-block-container {
+    display: flex;
+    align-items: center;
+}
+.cro-block-distribution .cro-block {
+    flex: 1;
+    padding: 0 5px;
+}
+.cro-block-distribution .cro-slider {
+    flex: 2;
+    margin-top: 20px;
+}
+.cro-block-distribution .cro-block input[type="number"] {
+    width: 60px;
+    margin-top: 5px;
+}

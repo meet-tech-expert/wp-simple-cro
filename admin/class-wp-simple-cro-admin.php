@@ -59,12 +59,13 @@ class Wp_Simple_Cro_Admin {
 	 *
 	 * @since    1.0.0
 	 */
+	
 	public function enqueue_styles() {
 
 		wp_enqueue_style( $this->plugin_name, plugin_dir_url( __FILE__ ) . 'css/wp-simple-cro-admin.css', array(), $this->version, 'all' );
-
+		wp_enqueue_style( 'simple-cro-gutenberg', plugin_dir_url( __FILE__ ) . 'css/simple-cro.css', array(), $this->version, 'all' );
 	}
-
+	
 	/**
 	 * Register the JavaScript for the admin area.
 	 *
