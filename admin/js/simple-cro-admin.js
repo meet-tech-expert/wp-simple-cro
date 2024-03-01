@@ -55,11 +55,11 @@
                 },
                 croBlock1Slider: {
                     type: 'number',
-                    default: 50
+                    default: '50'
                 },
                 croBlock2Slider: {
                     type: 'number',
-                    default: 50
+                    default: '50'
                 },
                 croBlock1Title: {
                     type: 'string',
@@ -81,21 +81,20 @@
 
             edit: function( props ) {
                 const { attributes, setAttributes } = props;            
-                // const { isNewCRO, isExistCRO, selectedCRO, selectedPostContent} = attributes;
-                const { isNewCRO, isExistCRO, selectedCRO, croTitle, croCat, croTags, croUniqueId, croBlock1Title, croBlock1UniqueId, croBlock2Title, croBlock2UniqueId,croBlock1Slider,croBlock2Slider,selectedPostContent } = attributes;
+                const { isNewCRO, isExistCRO, selectedCRO, croTitle, croCat, croTags, croUniqueId, croBlock1Title, croBlock1UniqueId, croBlock2Title, croBlock2UniqueId, croBlock1Slider, croBlock2Slider, selectedPostContent } = attributes;
 
                 const handleNewButtonClick = () => {
                     setAttributes({ isNewCRO: true, isExistCRO: false});
                 };
                 
                 const handleExistingButtonClick = () => {
-                    setAttributes({ isExistCRO: true, isNewCRO: true });
+                    setAttributes({ isExistCRO: true, isNewCRO: false });
                 };
+
+                // Handle post selection change
                 const handlePostSelectChange = (event) => {
                     const newValue = event.target.value;
                     setAttributes({ selectedCRO: newValue });
-                    //console.log(newValue);
-                    // Make a request to the WordPress REST API to fetch post content
                     fetch(`/wp-json/wp/v2/simple_cro/${newValue}`)
                         .then(response => {
                             if (response.ok) {
@@ -105,20 +104,24 @@
                             }
                         })
                         .then(post => {
-                            // Access the content of the selected post
-                            const postContent = post.content.rendered;
-                            // // Set the selected post content as attributes
-                            setAttributes({ selectedPostContent: postContent }); 
-                            setAttributes( { croTitle: $(post.content.rendered).data('title') } )
-                            setAttributes( { croCat: $(post.content.rendered).data('cat') } )
-                            setAttributes( { croTags: $(post.content.rendered).data('tags') } )
-                            setAttributes( { croUniqueId: $(post.content.rendered).data('id') } )
-                            setAttributes( { croBlock1Slider: $(post.content.rendered).data('slider') } )
-                            setAttributes( { croBlock2Slider: $(post.content.rendered).data('slider') } )
-                            setAttributes( { croBlock1Title: $(post.content.rendered).data('title') } )
-                            setAttributes( { croBlock2Title: $(post.content.rendered).data('title') } )
-                            setAttributes( { croBlock1UniqueId: $(post.content.rendered).data('id') } )
-                            setAttributes( { croBlock2UniqueId: $(post.content.rendered).data('id') } )
+                            const postContent = post.content.rendered; 
+                            const $postContent = $(post.content.rendered);
+    console.log(postContent);
+                            // Set attributes using jQuery data() method
+                            setAttributes({ selectedPostContent: postContent });
+                            setAttributes({ croTitle: $(post.content.rendered).data('title') });
+                            setAttributes({ croCat: $(post.content.rendered).data('cat') });
+                            setAttributes({ croTags: $(post.content.rendered).data('tags') });
+                            setAttributes({ croUniqueId: $(post.content.rendered).data('scro-id') }); 
+                            setAttributes({ croBlock1Slider: $postContent.find('.simple-cro-inner-blocks').data('block1-percentage') });
+                            setAttributes({ croBlock2Slider: $postContent.find('.simple-cro-inner-blocks').data('block2-percentage') });
+                            setAttributes({ croBlock1Title: $postContent.find('.simple-cro-inner-blocks').data('block1-title') });
+                            setAttributes({ croBlock2Title: $postContent.find('.simple-cro-inner-blocks').data('block2-title') });
+                            setAttributes({ croBlock1UniqueId: $postContent.find('.simple-cro-inner-blocks').data('block1-id') });
+                            setAttributes({ croBlock2UniqueId: $postContent.find('.simple-cro-inner-blocks').data('block2-id') });
+                            console.log(croTitle);
+                            console.log(postContent);
+
                         })
                         .catch(error => {
                             console.error('Error fetching post content:', error);
@@ -126,12 +129,9 @@
                 };
                                 
                 const currentPostId = wp.data.select('core/editor').getCurrentPostId();
-                // console.log('Current Post ID:', currentPostId);
 
-                // Generate select options excluding the currently selected post being edited
                 const SelectedOptions = window.simpleCroBlock && window.simpleCroBlock.posts && window.simpleCroBlock.posts.length > 0
                     ? window.simpleCroBlock.posts.map(post => {
-                        // Exclude the current post ID from the options
                         if (post.ID !== currentPostId) {
                             return el('option', { key: post.ID, value: post.ID }, post.post_title);
                         }
@@ -148,10 +148,9 @@
                             { className: 'components-placeholder__label' }, 
                             el(
                                 'span',
-                                {className: 'dashicon dashicons dashicons-admin-page'}
+                                { className: 'dashicon dashicons dashicons-admin-page' }
                             ),
                             'Simple CRO',
-                            
                         ),
                         !isNewCRO && !isExistCRO && el( 
                             'div',
@@ -161,15 +160,15 @@
                         !isNewCRO && !isExistCRO && el(
                             'div',
                             { className: 'simple-cro-buttons components-placeholder__fieldset' },
-                        el( Button, {
-                            className: 'primary',
-                            isPrimary: true,
-                            onClick: handleNewButtonClick,
-                        }, 'New CRO' ),
-                        el( Button, {
-                            isSecondary: true,
-                            onClick: handleExistingButtonClick,
-                        }, 'Existing CRO')
+                            el( Button, {
+                                className: 'primary',
+                                isPrimary: true,
+                                onClick: handleNewButtonClick,
+                            }, 'New CRO' ),
+                            el( Button, {
+                                isSecondary: true,
+                                onClick: handleExistingButtonClick,
+                            }, 'Existing CRO')
                         ),
                     ),
                     isExistCRO && el(
@@ -195,22 +194,18 @@
                         ),
                     ),  
                                                 
-                    isNewCRO && el(
+                    (isNewCRO || isExistCRO) && el(
                         'div',
                         { className: 'simple-cro-editor' }, 
                         !isExistCRO && el('div', null,
-                            el(InnerBlocks, { allowedBlocks: true },
-                            )
-                            ),
+                            el(InnerBlocks, { allowedBlocks: true })
+                        ),
                         el(
                             InspectorControls,
                             null,
                             el(
                                 PanelBody,
-                                {
-                                    title: 'CRO Settings',
-                                    initialOpen: false,
-                                },
+                                { title: 'CRO Settings', initialOpen: false },
                                 el( TextControl, {
                                     label: 'CRO Title',
                                     value: croTitle,
@@ -268,7 +263,7 @@
                                                 },
                                                 min: 0,
                                                 max: 100,
-                                                step: 1,
+                                                step: 10,
                                             })
                                         ),
                                         el('div', { className: 'cro-block' }, 
@@ -290,10 +285,7 @@
                             ),
                             el(
                                 PanelBody,
-                                {
-                                    title: 'CRO Block Settings',
-                                    initialOpen: false,
-                                },
+                                { title: 'CRO Block Settings', initialOpen: false },
                                 el( TextControl, {
                                     label: 'Block 1 Title',
                                     value: croBlock1Title,
@@ -323,63 +315,76 @@
                     ),
                     selectedPostContent && el(
                         'div',
-                        { className: 'simple-cro-content', dangerouslySetInnerHTML: { __html: selectedPostContent }}
+                        { dangerouslySetInnerHTML: { __html: selectedPostContent }}
                     ),
-            ]},          
+                ];
+            },          
             save: function(props) {
-
-                const { croTitle, croCat , croBlock1Title, croTags, croUniqueId,croBlock1Slider,croBlock2Slider ,croBlock1UniqueId, croBlock2Title, croBlock2UniqueId , selectedPostContent} = props.attributes;
-                
-                // // Check if any of the required fields are blank
-                // if (!croTitle || !croCat || !croBlock1Title || !croTags || !croUniqueId || !croBlock1UniqueId || !croBlock2Title || !croBlock2UniqueId) {
-                //     // Return null to prevent saving and display an error message
-                //     return null;
-                // }   
+                const { 
+                    isNewCRO,
+                    croTitle, 
+                    croCat, 
+                    croBlock1Title, 
+                    croTags, 
+                    croUniqueId, 
+                    croBlock1Slider, 
+                    croBlock2Slider, 
+                    croBlock1UniqueId, 
+                    croBlock2Title, 
+                    croBlock2UniqueId, 
+                    selectedPostContent
+                } = props.attributes;
+            
                 function getCurrentPage() {
                     return window.location.pathname;
                 }
+            
                 const croWrapperLength = $(".simple-cro-wrapper").length;
                 console.log('Length:', croWrapperLength);
-                // Example usage
+            
                 const currentPage = getCurrentPage();
                 console.log('Current Page:', currentPage);
+            
                 return (
-                    el(
-                        'div',
-                        { 
-                            className: 'simple-cro-wrapper', 
-                            'data-title': croTitle, 
-                            'data-cat': croCat, 
-                            'data-tags': croTags, 
-                            'data-id': croUniqueId,
-                            'data-block1-percentage': croBlock1Slider,
-                            'data-block2-percentage': croBlock2Slider,
-                            'data-scro-device':'',
-                            'data-scro-position': '',
-                            'data-scro-block-variation':'',
-                        },               
-
+                    isNewCRO ? (
                         el(
                             'div',
-                            {
-                                className: 'simple-cro-inner-blocks',
-                                'data-block1-id': croBlock1UniqueId,
-                                'data-block2-id': croBlock2UniqueId,
-                                'data-block1-title': croBlock1Title,
-                                'data-block2-title': croBlock2Title,
-                                'data-scro-block-position': '',
-                            },
-                            el(InnerBlocks.Content)
-                        ),
-                     
+                            { 
+                                className: 'simple-cro-wrapper', 
+                                'data-title': croTitle, 
+                                'data-cat': croCat, 
+                                'data-tags': croTags, 
+                                'data-scro-id': croUniqueId,
+                                'data-scro-device':'',
+                                'data-scro-position': '', 
+                                'data-scro-variation':'', 
+                                'data-scro-unique-id':'' 
+                            },               
+                            el(
+                                'div',
+                                {
+                                    className: 'simple-cro-inner-blocks',
+                                    'data-block1-id': croBlock1UniqueId,
+                                    'data-block2-id': croBlock2UniqueId,
+                                    'data-block1-title': croBlock1Title,
+                                    'data-block2-title': croBlock2Title,
+                                    'data-scro-block-position': '', 
+                                    'data-scro-block-variation':'',                                     
+                                    'data-block1-percentage': croBlock1Slider,
+                                    'data-block2-percentage': croBlock2Slider,
+                                },
+                                el(InnerBlocks.Content)
+                            )
+                        )                        
+                    ) : (
                         selectedPostContent && el(
                             'div',
-                                { 
-                                    className: 'simple-cro-content',dangerouslySetInnerHTML: { __html: selectedPostContent }
-                                }
-                            )
-                        ));
-            }                                
+                            { dangerouslySetInnerHTML: { __html: selectedPostContent } }
+                        )
+                    )
+                );
+                
+            }                                                                  
         });    
     })(
         window.wp.blocks,
