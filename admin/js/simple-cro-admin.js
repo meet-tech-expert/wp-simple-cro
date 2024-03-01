@@ -104,11 +104,15 @@
                             }
                         })
                         .then(post => {
-                            const postContent = post.content.rendered; 
+                            // const postContent = post.content.rendered; 
                             const $postContent = $(post.content.rendered);
-    console.log(postContent);
+                            // console.log(postContent);
+                            const innerBlockContent = $postContent.find('.simple-cro-inner-blocks').html();
+                            // console.log(innerBlockContent);
                             // Set attributes using jQuery data() method
-                            setAttributes({ selectedPostContent: postContent });
+                            // setAttributes({ selectedPostContent: postContent });
+                            setAttributes({ selectedPostContent: innerBlockContent });
+
                             setAttributes({ croTitle: $(post.content.rendered).data('title') });
                             setAttributes({ croCat: $(post.content.rendered).data('cat') });
                             setAttributes({ croTags: $(post.content.rendered).data('tags') });
@@ -119,15 +123,20 @@
                             setAttributes({ croBlock2Title: $postContent.find('.simple-cro-inner-blocks').data('block2-title') });
                             setAttributes({ croBlock1UniqueId: $postContent.find('.simple-cro-inner-blocks').data('block1-id') });
                             setAttributes({ croBlock2UniqueId: $postContent.find('.simple-cro-inner-blocks').data('block2-id') });
-                            console.log(croTitle);
-                            console.log(postContent);
+                            setAttributes({ isNewCRO: true });
+                            setAttributes({ isExistCRO: false });
 
                         })
                         .catch(error => {
                             console.error('Error fetching post content:', error);
                         });
                 };
-                                
+                // Handle editing of selected post content
+                const handlePostContentEdit = (event) => {
+                    const newContent = event.target.innerHTML;
+                    console.log(newContent);
+                    setAttributes({ selectedPostContent: newContent });
+                }
                 const currentPostId = wp.data.select('core/editor').getCurrentPostId();
 
                 const SelectedOptions = window.simpleCroBlock && window.simpleCroBlock.posts && window.simpleCroBlock.posts.length > 0
@@ -194,7 +203,7 @@
                         ),
                     ),  
                                                 
-                    (isNewCRO || isExistCRO) && el(
+                    isNewCRO  && el(
                         'div',
                         { className: 'simple-cro-editor' }, 
                         !isExistCRO && el('div', null,
@@ -313,10 +322,19 @@
                             )
                         )
                     ),
+                    // selectedPostContent && el(
+                    //     'div',
+                    //     { dangerouslySetInnerHTML: { __html: selectedPostContent }}
+                    // ),
                     selectedPostContent && el(
                         'div',
-                        { dangerouslySetInnerHTML: { __html: selectedPostContent }}
-                    ),
+                        { 
+                            className: 'selected-post-content-container', 
+                            contentEditable: true, // Allow content editing
+                            // onInput: handlePostContentEdit, 
+                            dangerouslySetInnerHTML: { __html: selectedPostContent } 
+                        }
+                    )
                 ];
             },          
             save: function(props) {
@@ -335,18 +353,17 @@
                     selectedPostContent
                 } = props.attributes;
             
-                function getCurrentPage() {
-                    return window.location.pathname;
-                }
+                // function getCurrentPage() {
+                //     return window.location.pathname;
+                // }
             
-                const croWrapperLength = $(".simple-cro-wrapper").length;
-                console.log('Length:', croWrapperLength);
+                // const croWrapperLength = $(".simple-cro-wrapper").length;
+                // console.log('Length:', croWrapperLength);
             
-                const currentPage = getCurrentPage();
-                console.log('Current Page:', currentPage);
+                // const currentPage = getCurrentPage();
+                // console.log('Current Page:', currentPage);
             
                 return (
-                    isNewCRO ? (
                         el(
                             'div',
                             { 
@@ -374,11 +391,9 @@
                                     'data-block2-percentage': croBlock2Slider,
                                 },
                                 el(InnerBlocks.Content)
-                            )
-                        )                        
-                    ) : (
+                            ),
                         selectedPostContent && el(
-                            'div',
+                            '',
                             { dangerouslySetInnerHTML: { __html: selectedPostContent } }
                         )
                     )
