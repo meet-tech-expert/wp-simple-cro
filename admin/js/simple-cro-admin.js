@@ -322,19 +322,16 @@
                             )
                         )
                     ),
-                    // selectedPostContent && el(
-                    //     'div',
-                    //     { dangerouslySetInnerHTML: { __html: selectedPostContent }}
-                    // ),
                     selectedPostContent && el(
                         'div',
                         { 
                             className: 'selected-post-content-container', 
                             contentEditable: true, // Allow content editing
-                            // onInput: handlePostContentEdit, 
+                            onBlur: handlePostContentEdit, // Use onBlur event
                             dangerouslySetInnerHTML: { __html: selectedPostContent } 
                         }
                     )
+                    
                 ];
             },          
             save: function(props) {
@@ -352,43 +349,27 @@
                     croBlock2UniqueId, 
                     selectedPostContent
                 } = props.attributes;
-            
-                // function getCurrentPage() {
-                //     return window.location.pathname;
-                // }
-            
-                // const croWrapperLength = $(".simple-cro-wrapper").length;
-                // console.log('Length:', croWrapperLength);
-            
-                // const currentPage = getCurrentPage();
-                // console.log('Current Page:', currentPage);
-            
+                
                 return (
                         el(
                             'div',
                             { 
-                                className: 'simple-cro-wrapper', 
+                                className: 'simple-cro-wrapper',  
+                                'data-scro-id': croUniqueId,
                                 'data-title': croTitle, 
                                 'data-cat': croCat, 
-                                'data-tags': croTags, 
-                                'data-scro-id': croUniqueId,
-                                'data-scro-device':'',
-                                'data-scro-position': '', 
-                                'data-scro-variation':'', 
-                                'data-scro-unique-id':'' 
+                                'data-tags': croTags
                             },               
                             el(
                                 'div',
                                 {
                                     className: 'simple-cro-inner-blocks',
-                                    'data-block1-id': croBlock1UniqueId,
-                                    'data-block2-id': croBlock2UniqueId,
-                                    'data-block1-title': croBlock1Title,
-                                    'data-block2-title': croBlock2Title,
-                                    'data-scro-block-position': '', 
-                                    'data-scro-block-variation':'',                                     
+                                    'data-scro-block1-id': croBlock1UniqueId,
+                                    'data-scro-block2-id': croBlock2UniqueId,                                                                  
                                     'data-block1-percentage': croBlock1Slider,
                                     'data-block2-percentage': croBlock2Slider,
+                                    'data-block1-title': croBlock1Title,
+                                    'data-block2-title': croBlock2Title,       
                                 },
                                 el(InnerBlocks.Content)
                             ),
@@ -397,8 +378,7 @@
                             { dangerouslySetInnerHTML: { __html: selectedPostContent } }
                         )
                     )
-                );
-                
+                );                
             }                                                                  
         });    
     })(
