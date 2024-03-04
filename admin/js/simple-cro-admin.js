@@ -108,7 +108,7 @@
                             const $postContent = $(post.content.rendered);
                             // console.log(postContent);
                             const innerBlockContent = $postContent.find('.simple-cro-inner-blocks').html();
-                            // console.log(innerBlockContent);
+                           // console.log(innerBlockContent);
                             // Set attributes using jQuery data() method
                             // setAttributes({ selectedPostContent: postContent });
                             setAttributes({ selectedPostContent: innerBlockContent });
