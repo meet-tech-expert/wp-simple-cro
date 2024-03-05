@@ -363,7 +363,7 @@
                             el(
                                 'div',
                                 {
-                                    className: 'simple-cro-inner-blocks',
+                                    className: 'simple-cro-inner-blocks invisible',
                                     'data-scro-block1-id': croBlock1UniqueId,
                                     'data-scro-block2-id': croBlock2UniqueId,                                                                  
                                     'data-block1-percentage': croBlock1Slider,

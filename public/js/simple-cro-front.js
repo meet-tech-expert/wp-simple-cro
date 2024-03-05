@@ -2,7 +2,7 @@
     function handleSimpleCRO() {
 
         var croWrappers = $('.simple-cro-wrapper');
-
+       
         if (croWrappers.length > 0) {
             croWrappers.each(function(index) {
                 var croWrapper = $(this);
@@ -34,18 +34,18 @@
                             if (childBlockIndex === 0) {
                                 // Set attributes for the first block
                                 childCroBlock.attr('data-scro-block1-id', croBlock.attr('data-scro-block1-id'));
-                                // childCroBlock.attr('data-block1-percentage', croBlock.attr('data-block1-percentage'));
-                                // childCroBlock.attr('data-block1-title', croBlock.attr('data-block1-title'));
-                                // childCroBlock.attr('data-scro-block-position', childBlockIndex + 1); 
-                                // childCroBlock.attr('data-scro-block-variation', childBlockIndex % 2 === 0? 'a' : 'b'); 
+                                childCroBlock.attr('data-block1-percentage', croBlock.attr('data-block1-percentage'));
+                                childCroBlock.attr('data-block1-title', croBlock.attr('data-block1-title'));
+                                childCroBlock.attr('data-scro-block-position', childBlockIndex + 1); 
+                                childCroBlock.attr('data-scro-block-variation', childBlockIndex % 2 === 0? 'a' : 'b'); 
 
                             } else if (childBlockIndex === 1) {
                                 // Set attributes for the second block
                                 childCroBlock.attr('data-scro-block2-id', croBlock.attr('data-scro-block2-id'));
-                                // childCroBlock.attr('data-block2-percentage', croBlock.attr('data-block2-percentage'));
-                                // childCroBlock.attr('data-block2-title', croBlock.attr('data-block2-title'));
-                                // childCroBlock.attr('data-scro-block-position', childBlockIndex + 1); 
-                                // childCroBlock.attr('data-scro-block-variation', childBlockIndex % 2 === 0? 'a' : 'b'); 
+                                childCroBlock.attr('data-block2-percentage', croBlock.attr('data-block2-percentage'));
+                                childCroBlock.attr('data-block2-title', croBlock.attr('data-block2-title'));
+                                childCroBlock.attr('data-scro-block-position', childBlockIndex + 1); 
+                                childCroBlock.attr('data-scro-block-variation', childBlockIndex % 2 === 0? 'a' : 'b'); 
                             }
                         });
 
@@ -87,7 +87,20 @@
                                 });
                             }
                         } 
-                    });
+                    });                    
+                    var block1Percentage = parseInt(croBlocks.attr('data-block1-percentage'));
+                    var block2Percentage = parseInt(croBlocks.attr('data-block2-percentage'));
+
+                    var randomNumber = Math.floor(Math.random() * 100) + 1;
+                    console.log(block1Percentage, block2Percentage);
+                    console.log(randomNumber);
+
+                    if (randomNumber <= block1Percentage) {
+                        croBlocks.find('[data-scro-block2-id]').remove();                        
+                    } else {
+                        croBlocks.find('[data-scro-block1-id]').remove();
+                    }
+                    croWrapper.find('.simple-cro-inner-blocks').removeClass('invisible');
                 }
             });
         }
