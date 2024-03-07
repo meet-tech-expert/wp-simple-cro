@@ -84,6 +84,52 @@
                                     // Set data attributes for page path and device type
                                     croCTA.attr('data-scro-cta-page-path', pagePath);
                                     croCTA.attr('data-scro-cta-device', deviceType);
+                                    // Add click event listener to each link/button
+                                    croCTA.on('click', function() {
+                                        var croBlockId = croWrapper.data('scro-id');
+                                        var croTitle = croWrapper.data('title');
+                                        var croCat = croWrapper.data('cat');
+                                        var croTag = croWrapper.data('tags');
+                                        var croUniqueId = croWrapper.data('scro-unique-id');
+                                        var croBlock1Id = croBlock.data('scro-block1-id');
+                                        var croBlock2Id = croBlock.data('scro-block2-id');
+                                        var croBlock1Title = croBlock.data('block1-title');
+                                        var croBlock2Title = croBlock.data('block2-title');
+                                        var croBlock1Percentage = croBlock.data('block1-percentage');
+                                        var croBlock2Percentage = croBlock.data('block2-percentage');
+                                        var pagePath =   croCTA.attr('data-scro-cta-page-path', pagePath);
+
+                                        var deviceType =   croCTA.attr('data-scro-cta-device', deviceType);
+
+                                        // Send AJAX request to track the click
+                                        $.ajax({
+                                            url: simpleCroFrontBlock.ajax_url,
+                                            method: 'POST',
+                                            data: {
+                                                action: 'handle_cro_click',
+                                                croBlockId: croBlockId,
+                                                croTitle: croTitle,
+                                                croCat: croCat,
+                                                croTag: croTag,
+                                                croUniqueId: croUniqueId,
+                                                croBlock1Id: croBlock1Id,
+                                                croBlock2Id: croBlock2Id,
+                                                croBlock1Title: croBlock1Title,
+                                                croBlock2Title: croBlock2Title,
+                                                croBlock1Percentage: croBlock1Percentage,
+                                                croBlock2Percentage: croBlock2Percentage,
+                                                pagePath: pagePath,
+                                                deviceType: deviceType
+                                            },
+                                            success: function(response) {
+                                                console.log('Click tracked successfully');
+                                            },
+                                            error: function(xhr, status, error) {
+                                                console.error('Error tracking click:', error);
+                                            }
+                                        });
+                                    });
+                                    
                                 });
                             }
                         } 
@@ -95,19 +141,19 @@
                     console.log(block1Percentage, block2Percentage);
                     console.log(randomNumber);
 
-                    if (randomNumber <= block1Percentage) {
-                        croBlocks.find('[data-scro-block2-id]').remove();                        
-                    } else {
-                        croBlocks.find('[data-scro-block1-id]').remove();
-                    }
-                    croWrapper.find('.simple-cro-inner-blocks').removeClass('invisible');
+                    // if (randomNumber <= block1Percentage) {
+                    //     croBlocks.find('[data-scro-block2-id]').remove();                        
+                    // } else {
+                    //     croBlocks.find('[data-scro-block1-id]').remove();
+                    // }
+                    // croWrapper.find('.simple-cro-inner-blocks').removeClass('invisible');
                 }
             });
         }
-    }
-
+    }   
     // Call the function when the document is ready
     $(document).ready(function() {
         handleSimpleCRO();
     });
-})(jQuery);
+
+})(jQuery);   

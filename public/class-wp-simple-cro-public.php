@@ -74,6 +74,56 @@ class Wp_Simple_Cro_Public {
 
 		wp_enqueue_script( $this->plugin_name, plugin_dir_url( __FILE__ ) . 'js/wp-simple-cro-public.js', array( 'jquery' ), $this->version, false );
 		wp_enqueue_script( 'simple-cro-gutenberg', plugin_dir_url( __FILE__ ) . 'js/simple-cro-front.js', array( 'jquery' ), $this->version, false );	
+		wp_localize_script( 'simple-cro-gutenberg', 'simpleCroFrontBlock', array(
+			'ajax_url' => admin_url('admin-ajax.php'),
+		));
+	}	
+	function handle_cro_click() {
+		global $wpdb;
 	
+		// Get data sent via AJAX
+		$croBlockId = $_POST['croBlockId'];
+		$croTitle = $_POST['croTitle'];
+		$croCat = $_POST['croCat'];
+		$croTag = $_POST['croTag'];
+		$croUniqueId = $_POST['croUniqueId'];
+		$croBlock1Id = $_POST['croBlock1Id'];
+		$croBlock2Id = $_POST['croBlock2Id'];
+		$croBlock1Title = $_POST['croBlock1Title'];
+		$croBlock2Title = $_POST['croBlock2Title'];
+		$croBlock1Percentage = $_POST['croBlock1Percentage'];
+		$croBlock2Percentage = $_POST['croBlock2Percentage'];
+		$deviceType = $_POST['deviceType'];
+		$pagePath = $_POST['pagePath'];
+
+		// Sanitize data before inserting into the database
+		$data = array(
+			'scro_id' => intval($croBlockId),
+			'scro_unique_id' => intval($croUniqueId),
+			'scro_title' => sanitize_text_field($croTitle),
+			'scro_category' => sanitize_text_field($croCat),
+			'scro_tag' => sanitize_text_field($croTag),
+			'block1_percentage' => intval($croBlock1Percentage),
+			'block2_percentage' => intval($croBlock2Percentage),
+			'block1_id' => intval($croBlock1Id),
+			'block1_title' => sanitize_text_field($croBlock1Title),
+			'block2_id' => intval($croBlock2Id),
+			'block2_title' => sanitize_text_field($croBlock2Title),
+			'device_type' => sanitize_text_field($deviceType),
+			'page_path' => esc_url_raw($pagePath)
+		);
+
+
+	
+		// Insert data into the database table
+		$table_name = $wpdb->prefix . 'simple_cro_blocks';
+		$wpdb->insert($table_name, $data);
+	
+		// Send JSON response
+		wp_send_json_success('Click handled successfully');
+	
+		// Always exit to prevent unwanted output
+		exit;
 	}
+	
 }
