@@ -1,157 +1,153 @@
 (function($) {
     function handleSimpleCRO() {
 
-        var croWrappers = $('.simple-cro-wrapper');
+        var scroWraps = $('.scro-wrapper');
        
-        if (croWrappers.length > 0) {
-            croWrappers.each(function(index) {
-                var croWrapper = $(this);
-                //page path
-                var pagePath = window.location.pathname.replace(/\//g, '_').replace(/^_+|_+$/g, '');
-                //get device
-                var deviceType = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) ? 'mobile' : 'desktop'; // Detect the device type once
-    
-                // Set data attributes for the Simple CRO wrapper
-                croWrapper.attr('data-scro-position', index + 1); 
-                croWrapper.attr('data-scro-variation', index % 2 === 0 ? 'a' : 'b');
-                // Construct unique ID based on cro test unique id, variation, and position
-                var uniqueId = croWrapper.data('scro-id') + '_' + croWrapper.data('scro-variation') + '_' + (index + 1);
-                croWrapper.attr('data-scro-unique-id', uniqueId);
-                croWrapper.attr('data-scro-page-path', pagePath);
-                croWrapper.attr('data-scro-device', deviceType);
+        if (scroWraps.length > 0) {
 
-                // Handle Simple CRO block within the wrapper
-                var croBlocks = croWrapper.find('.simple-cro-inner-blocks');
-                if (croBlocks.length > 0) {
-                    croBlocks.each(function(blockIndex) {
-                        var croBlock = $(this);
-                        // Loop through the child elements of croBlock
-                        croBlock.children().each(function(childBlockIndex) {
-                            var childCroBlock = $(this);
-                            // var tagName = childCroBlock.prop("tagName").toLowerCase(); 
-                            // console.log("Tag name:", tagName);
+            scroWraps.each(function(index) {
+                var scroWrap = $(this);
 
-                            if (childBlockIndex === 0) {
+                var scroPagePath = window.location.pathname.replace(/\//g, '_').replace(/^_+|_+$/g, '');
+                var scroDeviceType = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) ? 'mobile' : 'desktop'; // Detect the device type once
+                
+                scroWrap.attr('data-scro-id', scroWrap.data('scro-id'));
+                scroWrap.attr('data-scro-position', index + 1); 
+                scroWrap.attr('data-scro-varition', index % 2 === 0 ? 'a' : 'b');
+                scroWrap.attr('data-scro-unquie-id', scroWrap.data('scro-id') + '_' + (index % 2 === 0 ? 'a' : 'b') + '_' + (index + 1));
+                scroWrap.attr('data-scro-page-path', scroPagePath);
+                scroWrap.attr('data-scro-device', scroDeviceType);
+
+                var scroBlocks = scroWrap.find('.scro-inner-blocks');
+                if (scroBlocks.length > 0) {
+                    scroBlocks.each(function(blockIndex) {
+                        var scroBlock = $(this);
+
+                        var scroBlock1Id = scroBlock.data('scro-block1-id');
+                        var scroBlock2Id = scroBlock.data('scro-block2-id');
+                        var scroBlockVar = blockIndex % 2 === 0 ? 'a' : 'b';                   
+                
+                        scroBlock.attr('data-scro-block-position', blockIndex + 1); 
+                        scroBlock.attr('data-scro-block-varition', scroBlockVar); 
+                        scroBlock.attr('data-scro-block-unquie-id', (scroBlock1Id || scroBlock2Id) + '_' + scroBlockVar + '_' + (blockIndex + 1));
+                                               
+                        scroBlock.children().each(function(childIndex) {
+                        
+                            var scroChildBlock = $(this);   
+                            var scroBlock1UnquieId = scroBlock1Id + '_' + scroBlockVar + '_' + (childIndex + 1);
+                            var scroBlock2UnquieId = scroBlock2Id + '_' + scroBlockVar + '_' + (childIndex + 1);
+                     
+                            if (childIndex === 0) {
                                 // Set attributes for the first block
-                                childCroBlock.attr('data-scro-block1-id', croBlock.attr('data-scro-block1-id'));
-                                childCroBlock.attr('data-block1-percentage', croBlock.attr('data-block1-percentage'));
-                                childCroBlock.attr('data-block1-title', croBlock.attr('data-block1-title'));
-                                childCroBlock.attr('data-scro-block-position', childBlockIndex + 1); 
-                                childCroBlock.attr('data-scro-block-variation', childBlockIndex % 2 === 0? 'a' : 'b'); 
-
-                            } else if (childBlockIndex === 1) {
+                                scroChildBlock.attr('data-scro-block1-id', scroBlock1Id);
+                                scroChildBlock.attr('data-scro-block-position', childIndex + 1); 
+                                scroChildBlock.attr('data-scro-block-varition', childIndex % 2 === 0? 'a' : 'b'); 
+                                scroChildBlock.attr('data-scro-block1-unquie-id', scroBlock1UnquieId); 
+                            } else if (childIndex === 1) {
                                 // Set attributes for the second block
-                                childCroBlock.attr('data-scro-block2-id', croBlock.attr('data-scro-block2-id'));
-                                childCroBlock.attr('data-block2-percentage', croBlock.attr('data-block2-percentage'));
-                                childCroBlock.attr('data-block2-title', croBlock.attr('data-block2-title'));
-                                childCroBlock.attr('data-scro-block-position', childBlockIndex + 1); 
-                                childCroBlock.attr('data-scro-block-variation', childBlockIndex % 2 === 0? 'a' : 'b'); 
+                                scroChildBlock.attr('data-scro-block2-id', scroBlock2Id);
+                                scroChildBlock.attr('data-scro-block-position', childIndex + 1); 
+                                scroChildBlock.attr('data-scro-block-varition', childIndex % 2 === 0? 'a' : 'b'); 
+                                scroChildBlock.attr('data-scro-block2-unquie-id', scroBlock2UnquieId); 
                             }
                         });
-
-                        croBlock.attr('data-scro-block-position', blockIndex + 1); 
-                        croBlock.attr('data-scro-block-variation', blockIndex % 2 === 0? 'a' : 'b'); 
-                      
-                        // Construct unique ID for the block
-                        var blockUniqueId = croBlock.data('scro-block1-id') + '_' + croBlock.data('scro-block2-id') + '_' + (blockIndex + 1);
-                        croBlock.attr('data-scro-block-unique-id', blockUniqueId);
-
-                        // Handle links/buttons within the block
-                        if(croBlock.find('.wp-block-columns').length > 0){
-                            var cols = 0, rows=0;
-                            croBlock.find('.wp-block-columns').each(function(c){
+                        
+                        if (scroBlock.find('.wp-block-columns').length > 0) {
+                            var cols = 0, rows = 0;
+                            scroBlock.find('.wp-block-columns').each(function(c) {
                                 cols += 1;
-                                if($(this).find('.wp-block-column').length > 0){
-                                    $(this).find('.wp-block-column').each(function(r){
+                                if ($(this).find('.wp-block-column').length > 0) {
+                                    $(this).find('.wp-block-column').each(function(r) {
                                         rows += 1;
-                                        $(this).find('a.wp-block-button__link').attr('data-scro-block-cta-row-column', cols+'_'+rows)
+                                        $(this).find('a.wp-block-button__link').attr('data-scro-block-cta-row-column', cols + '_' + rows)
                                     })
                                 }
                             });
-                        }else {
-                            var croCTAs = croBlock.find('a');
-                            if (croCTAs.length > 0) {
-                                croCTAs.each(function(ctaIndex) {
-                                    var croCTA = $(this);
-                                    // Set data attributes for links/buttons
-                                    croCTA.attr('data-scro-block-cta-row-column', croCTA.data('row-column') || 0); 
-                                    croCTA.attr('data-scro-block-cta-order', ctaIndex + 1); 
+                        } else {
+                            var scroCTAs = scroBlock.find('a');
+                            // console.log(scroCTAs);
+                            if (scroCTAs.length > 0) {
+                                scroCTAs.each(function(ctaIndex) {
+                                    var scroCTA = $(this);
+                                    var rowColumn = scroCTA.data('row-column') || 0
+                                    scroCTA.attr('data-scro-block-cta-row-column',rowColumn);
+                                    scroCTA.attr('data-scro-block-cta-order', ctaIndex + 1);
+                                    scroCTA.attr('data-scro-block-cta-unquie-id', (scroBlock1Id || scroBlock2Id) + '_' + scroBlockVar + '_' + (blockIndex + 1) + '_' + rowColumn + '_' + (ctaIndex + 1));
+                                    scroCTA.attr('data-scro-cta-page-path', scroPagePath);
+                                    scroCTA.attr('data-scro-cta-device', scroDeviceType);
 
-                                    // Construct unique ID for the link/button
-                                    var ctaUniqueId = blockUniqueId + '_' + (croCTA.data('row-column') || 0) + '_' + (ctaIndex + 1);
-                                    croCTA.attr('data-scro-block-cta-unique-id', ctaUniqueId);
-
-                                    // Set data attributes for page path and device type
-                                    croCTA.attr('data-scro-cta-page-path', pagePath);
-                                    croCTA.attr('data-scro-cta-device', deviceType);
-                                    // Add click event listener to each link/button
-                                    croCTA.on('click', function() {
-                                        var croBlockId = croWrapper.data('scro-id');
-                                        var croTitle = croWrapper.data('title');
-                                        var croCat = croWrapper.data('cat');
-                                        var croTag = croWrapper.data('tags');
-                                        var croUniqueId = croWrapper.data('scro-unique-id');
-                                        var croBlock1Id = croBlock.data('scro-block1-id');
-                                        var croBlock2Id = croBlock.data('scro-block2-id');
-                                        var croBlock1Title = croBlock.data('block1-title');
-                                        var croBlock2Title = croBlock.data('block2-title');
-                                        var croBlock1Percentage = croBlock.data('block1-percentage');
-                                        var croBlock2Percentage = croBlock.data('block2-percentage');
-                                        var pagePath =   croCTA.attr('data-scro-cta-page-path', pagePath);
-
-                                        var deviceType =   croCTA.attr('data-scro-cta-device', deviceType);
-
-                                        // Send AJAX request to track the click
+                                    scroCTA.on('click', function(event) {
+                                        event.preventDefault(); 
+                                        
+                                        var scroBtnUrl = $(this).attr('href'); // Get the URL from the button
+                                        
+                                        var scroID = scroWrap.attr('data-scro-id');
+                                        var scroUnquieId = scroWrap.attr('data-scro-unquie-id');
+                                        var scroTitle = scroWrap.data('scro-title');
+                                        var scroCat = scroWrap.data('scro-cat');
+                                        var scroTag = scroWrap.data('scro-tag');
+                                        var scroBlock1Id = scroBlock.data('scro-block1-id')
+                                        var scroBlock1Perc = scroBlock.data('scro-block1-perc');
+                                        var scroBlock1Title = scroBlock.data('scro-block1-title');
+                                        var scroBlock2Id = scroBlock.data('scro-block2-id');
+                                        var scroBlock2Perc = scroBlock.data('scro-block2-perc');
+                                        var scroBlock2Title = scroBlock.data('scro-block2-title');
+                                        
                                         $.ajax({
-                                            url: simpleCroFrontBlock.ajax_url,
+                                            url: scroFrontBlock.ajax_url,
                                             method: 'POST',
                                             data: {
-                                                action: 'handle_cro_click',
-                                                croBlockId: croBlockId,
-                                                croTitle: croTitle,
-                                                croCat: croCat,
-                                                croTag: croTag,
-                                                croUniqueId: croUniqueId,
-                                                croBlock1Id: croBlock1Id,
-                                                croBlock2Id: croBlock2Id,
-                                                croBlock1Title: croBlock1Title,
-                                                croBlock2Title: croBlock2Title,
-                                                croBlock1Percentage: croBlock1Percentage,
-                                                croBlock2Percentage: croBlock2Percentage,
-                                                pagePath: pagePath,
-                                                deviceType: deviceType
+                                                action: 'handle_scro_click',
+                                                scro_id: scroID,
+                                                scro_unique_id: scroUnquieId,
+                                                scro_title: scroTitle,
+                                                scro_cat: scroCat,
+                                                scro_tag: scroTag,
+                                                scro_block1_id: scroBlock1Id,
+                                                scro_block1_percentage: scroBlock1Perc,
+                                                scro_block1_title: scroBlock1Title,
+                                                scro_block2_id: scroBlock2Id,
+                                                scro_block2_percentage: scroBlock2Perc,
+                                                scro_block2_title: scroBlock2Title,
+                                                scro_page_path: scroPagePath,
+                                                scro_device_type: scroDeviceType,
+                                                scro_button_url: scroBtnUrl,
+                                                scro_nonce: scroFrontBlock.nonce
                                             },
                                             success: function(response) {
-                                                console.log('Click tracked successfully');
+                                                console.log(response);
+                                                console.log('Data stored successfully:', response);
+                                                // Redirect after storing data and hide loader
+                                                window.location.href = scroBtnUrl;
                                             },
                                             error: function(xhr, status, error) {
-                                                console.error('Error tracking click:', error);
+                                                console.error('Error storing data:', error);
                                             }
                                         });
                                     });
-                                    
+                                                  
                                 });
                             }
-                        } 
-                    });                    
-                    var block1Percentage = parseInt(croBlocks.attr('data-block1-percentage'));
-                    var block2Percentage = parseInt(croBlocks.attr('data-block2-percentage'));
+                        }
+                    });
 
-                    var randomNumber = Math.floor(Math.random() * 100) + 1;
-                    console.log(block1Percentage, block2Percentage);
-                    console.log(randomNumber);
+                    // Logic to randomly remove one of the blocks
+                    var scroBlock1Perc = parseInt(scroBlocks.attr('data-scro-block1-perc'));
+                    // var scroBlock2Perc = parseInt(scroBlocks.attr('data-scro-block2-perc'));
+                    var randNum = Math.floor(Math.random() * 100) + 1;
 
-                    // if (randomNumber <= block1Percentage) {
-                    //     croBlocks.find('[data-scro-block2-id]').remove();                        
-                    // } else {
-                    //     croBlocks.find('[data-scro-block1-id]').remove();
-                    // }
-                    // croWrapper.find('.simple-cro-inner-blocks').removeClass('invisible');
-                }
-            });
-        }
-    }   
-    // Call the function when the document is ready
+                    if (randNum <= scroBlock1Perc) {
+                        scroBlocks.find('[data-scro-block2-id]').remove();                        
+                        scroBlocks.find('[data-scro-block1-id]').attr('data-scro-active-block', true);
+                    } else {
+                        scroBlocks.find('[data-scro-block1-id]').remove();
+                        scroBlocks.find('[data-scro-block2-id]').attr('data-scro-active-block', true);
+                    }
+                    scroWrap.find('.scro-inner-blocks').removeClass('invisible');
+                }                
+            }); 
+        } 
+    }
     $(document).ready(function() {
         handleSimpleCRO();
     });

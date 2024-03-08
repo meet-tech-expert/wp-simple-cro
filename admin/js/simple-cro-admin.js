@@ -107,22 +107,22 @@
                             // const postContent = post.content.rendered; 
                             const $postContent = $(post.content.rendered);
                             // console.log(postContent);
-                            const innerBlockContent = $postContent.find('.simple-cro-inner-blocks').html();
+                            const innerBlockContent = $postContent.find('.scro-inner-blocks').html();
                            // console.log(innerBlockContent);
                             // Set attributes using jQuery data() method
                             // setAttributes({ selectedPostContent: postContent });
                             setAttributes({ selectedPostContent: innerBlockContent });
 
-                            setAttributes({ croTitle: $(post.content.rendered).data('title') });
-                            setAttributes({ croCat: $(post.content.rendered).data('cat') });
-                            setAttributes({ croTags: $(post.content.rendered).data('tags') });
+                            setAttributes({ croTitle: $(post.content.rendered).data('scro-title') });
+                            setAttributes({ croCat: $(post.content.rendered).data('scro-cat') });
+                            setAttributes({ croTags: $(post.content.rendered).data('scro-tags') });
                             setAttributes({ croUniqueId: $(post.content.rendered).data('scro-id') }); 
-                            setAttributes({ croBlock1Slider: $postContent.find('.simple-cro-inner-blocks').data('block1-percentage') });
-                            setAttributes({ croBlock2Slider: $postContent.find('.simple-cro-inner-blocks').data('block2-percentage') });
-                            setAttributes({ croBlock1Title: $postContent.find('.simple-cro-inner-blocks').data('block1-title') });
-                            setAttributes({ croBlock2Title: $postContent.find('.simple-cro-inner-blocks').data('block2-title') });
-                            setAttributes({ croBlock1UniqueId: $postContent.find('.simple-cro-inner-blocks').data('block1-id') });
-                            setAttributes({ croBlock2UniqueId: $postContent.find('.simple-cro-inner-blocks').data('block2-id') });
+                            setAttributes({ croBlock1Slider: $postContent.find('.scro-inner-blocks').data('scro-block1-percentage') });
+                            setAttributes({ croBlock2Slider: $postContent.find('.scro-inner-blocks').data('scro-block2-percentage') });
+                            setAttributes({ croBlock1Title: $postContent.find('.scro-inner-blocks').data('scro-block1-title') });
+                            setAttributes({ croBlock2Title: $postContent.find('.scro-inner-blocks').data('scro-block2-title') });
+                            setAttributes({ croBlock1UniqueId: $postContent.find('.scro-inner-blocks').data('scro-block1-id') });
+                            setAttributes({ croBlock2UniqueId: $postContent.find('.scro-inner-blocks').data('scro-block2-id') });
                             setAttributes({ isNewCRO: true });
                             setAttributes({ isExistCRO: false });
 
@@ -151,7 +151,7 @@
                     return [
                     el(
                         'div',
-                        { className: 'simple-cro-blocks components-placeholder is-large' },
+                        { className: 'scro-blocks components-placeholder is-large' },
                         el(
                             'div',
                             { className: 'components-placeholder__label' }, 
@@ -168,7 +168,7 @@
                         ),
                         !isNewCRO && !isExistCRO && el(
                             'div',
-                            { className: 'simple-cro-buttons components-placeholder__fieldset' },
+                            { className: 'scro-buttons components-placeholder__fieldset' },
                             el( Button, {
                                 className: 'primary',
                                 isPrimary: true,
@@ -188,7 +188,7 @@
                             { title: 'Existing CRO' },
                             el(
                                 'div',
-                                { className: 'simple-cro-post-select' },
+                                { className: 'scro-post-select' },
                                 el(
                                     'select',
                                     { value: selectedCRO, onChange: handlePostSelectChange },
@@ -205,7 +205,7 @@
                                                 
                     isNewCRO  && el(
                         'div',
-                        { className: 'simple-cro-editor' }, 
+                        { className: 'scro-editor' }, 
                         !isExistCRO && el('div', null,
                             el(InnerBlocks, { allowedBlocks: true })
                         ),
@@ -354,22 +354,22 @@
                         el(
                             'div',
                             { 
-                                className: 'simple-cro-wrapper',  
+                                className: 'scro-wrapper',  
                                 'data-scro-id': croUniqueId,
-                                'data-title': croTitle, 
-                                'data-cat': croCat, 
-                                'data-tags': croTags
+                                'data-scro-title': croTitle, 
+                                'data-scro-cat': croCat, 
+                                'data-scro-tag': croTags
                             },               
                             el(
                                 'div',
                                 {
-                                    className: 'simple-cro-inner-blocks invisible',
+                                    className: 'scro-inner-blocks invisible',
                                     'data-scro-block1-id': croBlock1UniqueId,
                                     'data-scro-block2-id': croBlock2UniqueId,                                                                  
-                                    'data-block1-percentage': croBlock1Slider,
-                                    'data-block2-percentage': croBlock2Slider,
-                                    'data-block1-title': croBlock1Title,
-                                    'data-block2-title': croBlock2Title,       
+                                    'data-scro-block1-perc': croBlock1Slider,
+                                    'data-scro-block2-perc': croBlock2Slider,
+                                    'data-scro-block1-title': croBlock1Title,
+                                    'data-scro-block2-title': croBlock2Title,       
                                 },
                                 el(InnerBlocks.Content)
                             ),

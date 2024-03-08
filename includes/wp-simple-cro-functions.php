@@ -15,4 +15,3 @@ function cro_admin_notice($msg, $type='info') {
         printf( '<div class="%1$s"><p>%2$s</p></div>', esc_attr( $type ), esc_html( $msg ) );
     });    
 }
-

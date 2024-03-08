@@ -1,5 +1,4 @@
 <?php
-
 /**
  * Fired during plugin activation
  *
@@ -22,44 +21,47 @@
  */
 class Wp_Simple_Cro_Activator {
 
-	/**
-	 * Short Description. (use period)
-	 *
-	 * Long Description.
-	 *
-	 * @since    1.0.0
-	 */
-	public static function activate() {
-
+    /**
+     * Activate the plugin.
+     *
+     * This method is called when the plugin is activated.
+     */
+    public static function activate() {
         global $wpdb;
-		// Check if custom post type simple_cro exists
-		if (post_type_exists(SIMPLE_CRO_CPT)) {
-			cro_admin_notice(SIMPLE_CRO_CPT . 'is already exists', 'error');
-			deactivate_plugins(plugin_basename(__FILE__));
-		}		
 
-		$table_name = $wpdb->prefix . 'simple_cro_blocks';
-		$charset_collate = $wpdb->get_charset_collate();
-		$sql = "CREATE TABLE $table_name (
-			id INT AUTO_INCREMENT PRIMARY KEY,
-			cro_id INT NOT NULL,
-			cro_unique_id INT NOT NULL,
-			cro_title VARCHAR(255) NOT NULL,
-			cro_category VARCHAR(255) NOT NULL,
-			cro_tag VARCHAR(255) NOT NULL,
-			block1_percentage INT NOT NULL,
-			block2_percentage INT NOT NULL,
-			block1_id INT NOT NULL,
-			block1_title VARCHAR(255) NOT NULL,
-			block2_id INT NOT NULL,
-			block2_title VARCHAR(255) NOT NULL,
-			device_type VARCHAR(255) NOT NULL,
-			page_path VARCHAR(255) NOT NULL,
-			click_timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-		) $charset_collate;";
+        // Check if custom post type simple_cro exists
+        if (post_type_exists(SIMPLE_CRO_CPT)) {
+            cro_admin_notice(SIMPLE_CRO_CPT . ' is already exists', 'error');
+            deactivate_plugins(plugin_basename(__FILE__));
+            return;
+        }
 
+        $table_name = $wpdb->prefix . 'simple_cro_block';
+        $charset_collate = $wpdb->get_charset_collate();
 
-		require_once(ABSPATH . 'wp-admin/includes/upgrade.php');
-		dbDelta($sql);    
-	}
+        $sql = "CREATE TABLE IF NOT EXISTS $table_name (
+            id INT AUTO_INCREMENT PRIMARY KEY,
+            scro_id INT NOT NULL COMMENT 'ID of the SCRO',
+            scro_unique_id VARCHAR(255) NOT NULL COMMENT 'Unique ID of the SCRO',
+            scro_title VARCHAR(255) NOT NULL COMMENT 'Title of the SCRO',
+            scro_cat VARCHAR(255) NOT NULL COMMENT 'Category of the SCRO',
+            scro_tag VARCHAR(255) NOT NULL COMMENT 'Tag of the SCRO',
+            scro_block1_id INT NOT NULL COMMENT 'ID of Block 1 in SCRO',
+            scro_block1_title VARCHAR(255) NOT NULL COMMENT 'Title of Block 1 in SCRO',
+            scro_block1_perc INT NOT NULL COMMENT 'Percentage of Block 1 in SCRO',
+            scro_block2_id INT NOT NULL COMMENT 'ID of Block 2 in SCRO',
+            scro_block2_title VARCHAR(255) NOT NULL COMMENT 'Title of Block 2 in SCRO',
+            scro_block2_perc INT NOT NULL COMMENT 'Percentage of Block 2 in SCRO',
+            scro_device_type VARCHAR(255) NOT NULL COMMENT 'Type of device used for SCRO',
+            scro_page_path VARCHAR(255) NOT NULL COMMENT 'Page path for SCRO',
+            scro_btn_url VARCHAR(255) NOT NULL COMMENT 'URL of the button in SCRO',
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP COMMENT 'Timestamp indicating when the record was created',
+            UNIQUE KEY `unique_scro_unique_id` (`scro_unique_id`),
+            UNIQUE KEY `unique_block1_id` (`scro_block1_id`),
+            UNIQUE KEY `unique_block2_id` (`scro_block2_id`)
+        ) $charset_collate;";
+
+        require_once(ABSPATH . 'wp-admin/includes/upgrade.php');
+        dbDelta($sql);
+    }
 }

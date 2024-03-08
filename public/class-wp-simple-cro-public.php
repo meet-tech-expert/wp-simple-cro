@@ -71,59 +71,79 @@ class Wp_Simple_Cro_Public {
 	 * @since    1.0.0
 	 */
 	public function enqueue_scripts() {
-
-		wp_enqueue_script( $this->plugin_name, plugin_dir_url( __FILE__ ) . 'js/wp-simple-cro-public.js', array( 'jquery' ), $this->version, false );
-		wp_enqueue_script( 'simple-cro-gutenberg', plugin_dir_url( __FILE__ ) . 'js/simple-cro-front.js', array( 'jquery' ), $this->version, false );	
-		wp_localize_script( 'simple-cro-gutenberg', 'simpleCroFrontBlock', array(
+		wp_enqueue_script( 'simple-cro-gutenberg', plugin_dir_url( __FILE__ ) . 'js/simple-cro-front.js', array( 'jquery' ), $this->version, false );
+		wp_localize_script( 'simple-cro-gutenberg', 'scroFrontBlock', array(
 			'ajax_url' => admin_url('admin-ajax.php'),
+			'nonce' => wp_create_nonce( 'handle_scro_data_nonce' ),
 		));
 	}	
-	function handle_cro_click() {
+	// store data in the database
+	function handle_scro_data() {
 		global $wpdb;
 	
-		// Get data sent via AJAX
-		$croBlockId = $_POST['croBlockId'];
-		$croTitle = $_POST['croTitle'];
-		$croCat = $_POST['croCat'];
-		$croTag = $_POST['croTag'];
-		$croUniqueId = $_POST['croUniqueId'];
-		$croBlock1Id = $_POST['croBlock1Id'];
-		$croBlock2Id = $_POST['croBlock2Id'];
-		$croBlock1Title = $_POST['croBlock1Title'];
-		$croBlock2Title = $_POST['croBlock2Title'];
-		$croBlock1Percentage = $_POST['croBlock1Percentage'];
-		$croBlock2Percentage = $_POST['croBlock2Percentage'];
-		$deviceType = $_POST['deviceType'];
-		$pagePath = $_POST['pagePath'];
-
-		// Sanitize data before inserting into the database
-		$data = array(
-			'scro_id' => intval($croBlockId),
-			'scro_unique_id' => intval($croUniqueId),
-			'scro_title' => sanitize_text_field($croTitle),
-			'scro_category' => sanitize_text_field($croCat),
-			'scro_tag' => sanitize_text_field($croTag),
-			'block1_percentage' => intval($croBlock1Percentage),
-			'block2_percentage' => intval($croBlock2Percentage),
-			'block1_id' => intval($croBlock1Id),
-			'block1_title' => sanitize_text_field($croBlock1Title),
-			'block2_id' => intval($croBlock2Id),
-			'block2_title' => sanitize_text_field($croBlock2Title),
-			'device_type' => sanitize_text_field($deviceType),
-			'page_path' => esc_url_raw($pagePath)
+		// Nonce verification
+		if (!isset($_POST['scro_nonce']) || !wp_verify_nonce($_POST['scro_nonce'], 'handle_scro_data_nonce')) {
+			wp_send_json_error('Nonce verification failed.');
+		}
+	
+		// Check if all required fields are set
+		$required_fields = array(
+			'scro_id', 'scro_unique_id', 'scro_cat', 'scro_title', 'scro_tag', 'scro_block1_id',
+			'scro_block1_percentage', 'scro_block1_title', 'scro_block2_id', 'scro_block2_percentage',
+			'scro_block2_title', 'scro_device_type', 'scro_page_path', 'scro_button_url'
 		);
-
-
 	
-		// Insert data into the database table
-		$table_name = $wpdb->prefix . 'simple_cro_blocks';
-		$wpdb->insert($table_name, $data);
+		foreach ($required_fields as $field) {
+			if (!isset($_POST[$field])) {
+				wp_send_json_error('One or more required fields are missing.');
+			}
+		}
 	
-		// Send JSON response
-		wp_send_json_success('Click handled successfully');
+		// Sanitize and validate input data
+		$scro_id = sanitize_text_field($_POST['scro_id']);
+		$scro_uid = sanitize_text_field($_POST['scro_unique_id']);
+		$scro_title = sanitize_text_field($_POST['scro_title']);
+		$scro_cat = sanitize_text_field($_POST['scro_cat']);
+		$scro_tag = sanitize_text_field($_POST['scro_tag']);
+		$scro_block1_id = sanitize_text_field($_POST['scro_block1_id']);
+		$scro_block1_title = sanitize_text_field($_POST['scro_block1_title']);
+		$scro_block1_perc = absint($_POST['scro_block1_percentage']);
+		$scro_block2_id = sanitize_text_field($_POST['scro_block2_id']);
+		$scro_block2_title = sanitize_text_field($_POST['scro_block2_title']);
+		$scro_block2_perc = absint($_POST['scro_block2_percentage']);
+		$scro_device_type = sanitize_text_field($_POST['scro_device_type']);
+		$scro_page_path = esc_url_raw($_POST['scro_page_path']);
+		$scro_btn_url = esc_url_raw($_POST['scro_button_url']);
 	
-		// Always exit to prevent unwanted output
-		exit;
+		// Insert data into the table
+		$table_name = $wpdb->prefix . 'simple_cro_block';
+	
+		$wpdb->insert(
+			$table_name,
+			array(
+				'scro_id' => $scro_id,
+				'scro_unique_id' => $scro_uid,
+				'scro_title' => $scro_title,
+				'scro_cat' => $scro_cat,
+				'scro_tag' => $scro_tag,
+				'scro_block1_id' => $scro_block1_id,
+				'scro_block1_title' => $scro_block1_title,
+				'scro_block1_perc' => $scro_block1_perc,
+				'scro_block2_id' => $scro_block2_id,
+				'scro_block2_title' => $scro_block2_title,
+				'scro_block2_perc' => $scro_block2_perc,
+				'scro_device_type' => $scro_device_type,
+				'scro_page_path' => $scro_page_path,
+				'scro_btn_url' => $scro_btn_url,
+			)
+		);
+	
+		// Check if data is inserted successfully
+		if ($wpdb->last_error) {
+			wp_send_json_error('Error storing data: ' . $wpdb->last_error);
+		} else {
+			wp_send_json_success('Data stored successfully.');
+		}
 	}
 	
 }
