@@ -36,25 +36,27 @@ class Wp_Simple_Cro_Activator {
             return;
         }
     
-        $table_name = $wpdb->prefix . 'simple_cro_block';
+        $table_name = $wpdb->prefix . SIMPLE_CRO_DB ;
         $charset_collate = $wpdb->get_charset_collate();
     
         $sql = "CREATE TABLE IF NOT EXISTS $table_name (
             id INT AUTO_INCREMENT PRIMARY KEY,
             scro_id VARCHAR(50) NOT NULL COMMENT 'ID of the SCRO',
-            scro_unique_id VARCHAR(50) NOT NULL COMMENT 'Unique ID of the SCRO',
-            scro_title VARCHAR(255) NOT NULL COMMENT 'Title of the SCRO',
-            scro_cat VARCHAR(255) NOT NULL COMMENT 'Category of the SCRO',
-            scro_tag VARCHAR(255) NOT NULL COMMENT 'Tag of the SCRO',
-            scro_block1_id VARCHAR(50) NOT NULL COMMENT 'ID of Block 1 in SCRO',
-            scro_block1_title VARCHAR(255) NOT NULL COMMENT 'Title of Block 1 in SCRO',
-            scro_block1_perc INT NOT NULL COMMENT 'Percentage of Block 1 in SCRO',
-            scro_block2_id VARCHAR(50) NOT NULL COMMENT 'ID of Block 2 in SCRO',
-            scro_block2_title VARCHAR(255) NOT NULL COMMENT 'Title of Block 2 in SCRO',
-            scro_block2_perc INT NOT NULL COMMENT 'Percentage of Block 2 in SCRO',
-            scro_device_type VARCHAR(255) NOT NULL COMMENT 'Type of device used for SCRO',
-            scro_page_path VARCHAR(255) NOT NULL COMMENT 'Page path for SCRO',
-            scro_btn_url VARCHAR(255) NOT NULL COMMENT 'URL of the button in SCRO',
+            unique_id VARCHAR(50) NOT NULL COMMENT 'Unique ID of the SCRO',
+            title VARCHAR(255) NOT NULL COMMENT 'Title of the SCRO',
+            cat VARCHAR(255) NOT NULL COMMENT 'Category of the SCRO',
+            tag VARCHAR(255) NOT NULL COMMENT 'Tag of the SCRO',
+            block1_id VARCHAR(50) NOT NULL COMMENT 'ID of Block 1 in SCRO',
+            block1_title VARCHAR(255) NOT NULL COMMENT 'Title of Block 1 in SCRO',
+            block1_perc INT NOT NULL COMMENT 'Percentage of Block 1 in SCRO',
+            block2_id VARCHAR(50) NOT NULL COMMENT 'ID of Block 2 in SCRO',
+            block2_title VARCHAR(255) NOT NULL COMMENT 'Title of Block 2 in SCRO',
+            block2_perc INT NOT NULL COMMENT 'Percentage of Block 2 in SCRO',
+            block_cta_row_column INT NOT NULL COMMENT 'CTA of Block in SCRO',
+            device_type VARCHAR(255) NOT NULL COMMENT 'Type of device used for SCRO',
+            page_path VARCHAR(255) NOT NULL COMMENT 'Page path for SCRO',
+            btn_url VARCHAR(255) NOT NULL COMMENT 'URL of the button in SCRO',
+            block_variation VARCHAR(5) NOT NULL COMMENT 'Variation of the block in SCRO',
             created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP 
         ) $charset_collate;";
     

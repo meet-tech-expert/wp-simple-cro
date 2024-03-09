@@ -38,6 +38,7 @@ if ( ! defined( 'WPINC' ) ) {
 define( 'WP_SIMPLE_CRO_VERSION', '1.0.0' );
 //Custom Post Type Constant
 define( 'SIMPLE_CRO_CPT', 'simple_cro' );
+define( 'SIMPLE_CRO_DB', 'simple_cro_block' );
 
 /**
  * The code that runs during plugin activation.
