@@ -59,91 +59,84 @@
                                 if ($(this).find('.wp-block-column').length > 0) {
                                     $(this).find('.wp-block-column').each(function(r) {
                                         rows += 1;
-                                        $(this).find('a.wp-block-button__link').attr('data-scro-block-cta-row-column', cols + '_' + rows)
-                                    })
+                                        var anchorTag = $(this).find('a.wp-block-button__link');
+                                        if (anchorTag.length === 0) {
+                                            // No anchor tag found, add data attribute to the button
+                                            $(this).find('.wp-block-button').attr('data-scro-block-cta-row-column', cols + '_' + rows);
+                                        } else {
+                                            // Anchor tag found, add additional attributes
+                                            var rowColumn = anchorTag.data('scro-block-cta-row-column') || 0;
+                                            anchorTag.attr('data-scro-block-cta-row-column', cols + '_' + rows);
+                                            anchorTag.attr('data-scro-block-cta-order', rows);
+                                            anchorTag.attr('data-scro-block-cta-unquie-id', (scroBlock1Id || scroBlock2Id) + '_' + scroBlockVar + '_' + (blockIndex + 1) + '_' + rowColumn + '_' + rows);
+                                            anchorTag.attr('data-scro-cta-page-path', scroPagePath);
+                                            anchorTag.attr('data-scro-cta-device', scroDeviceType);
+                                        }
+                                    });
                                 }
                             });
+                        }                        
+
+                         // Logic to randomly remove one of the blocks
+                        var scroBlock1Perc = parseInt(scroBlocks.attr('data-scro-block1-perc'));
+                        var scroBlock2Perc = parseInt(scroBlocks.attr('data-scro-block2-perc'));
+                        var randNum = Math.floor(Math.random() * 100) + 1;
+
+                        if (randNum <= scroBlock1Perc) {
+                            scroBlocks.find('[data-scro-block2-id]').remove();                        
+                            scroBlocks.find('[data-scro-block1-id]').attr('data-scro-active-block', true);
                         } else {
-                            var scroCTAs = scroBlock.find('a');
-                            // console.log(scroCTAs);
-                            if (scroCTAs.length > 0) {
-                                scroCTAs.each(function(ctaIndex) {
-                                    var scroCTA = $(this);
-                                    var rowColumn = scroCTA.data('row-column') || 0
-                                    scroCTA.attr('data-scro-block-cta-row-column',rowColumn);
-                                    scroCTA.attr('data-scro-block-cta-order', ctaIndex + 1);
-                                    scroCTA.attr('data-scro-block-cta-unquie-id', (scroBlock1Id || scroBlock2Id) + '_' + scroBlockVar + '_' + (blockIndex + 1) + '_' + rowColumn + '_' + (ctaIndex + 1));
-                                    scroCTA.attr('data-scro-cta-page-path', scroPagePath);
-                                    scroCTA.attr('data-scro-cta-device', scroDeviceType);
-
-                                    scroCTA.on('click', function(event) {
-                                        event.preventDefault(); 
-                                        
-                                        var scroBtnUrl = $(this).attr('href'); // Get the URL from the button
-                                        
-                                        var scroID = scroWrap.attr('data-scro-id');
-                                        var scroUnquieId = scroWrap.attr('data-scro-unquie-id');
-                                        var scroTitle = scroWrap.data('scro-title');
-                                        var scroCat = scroWrap.data('scro-cat');
-                                        var scroTag = scroWrap.data('scro-tag');
-                                        var scroBlock1Id = scroBlock.data('scro-block1-id')
-                                        var scroBlock1Perc = scroBlock.data('scro-block1-perc');
-                                        var scroBlock1Title = scroBlock.data('scro-block1-title');
-                                        var scroBlock2Id = scroBlock.data('scro-block2-id');
-                                        var scroBlock2Perc = scroBlock.data('scro-block2-perc');
-                                        var scroBlock2Title = scroBlock.data('scro-block2-title');
-                                        
-                                        $.ajax({
-                                            url: scroFrontBlock.ajax_url,
-                                            method: 'POST',
-                                            data: {
-                                                action: 'handle_scro_click',
-                                                scro_id: scroID,
-                                                scro_unique_id: scroUnquieId,
-                                                scro_title: scroTitle,
-                                                scro_cat: scroCat,
-                                                scro_tag: scroTag,
-                                                scro_block1_id: scroBlock1Id,
-                                                scro_block1_percentage: scroBlock1Perc,
-                                                scro_block1_title: scroBlock1Title,
-                                                scro_block2_id: scroBlock2Id,
-                                                scro_block2_percentage: scroBlock2Perc,
-                                                scro_block2_title: scroBlock2Title,
-                                                scro_page_path: scroPagePath,
-                                                scro_device_type: scroDeviceType,
-                                                scro_button_url: scroBtnUrl,
-                                                scro_nonce: scroFrontBlock.nonce
-                                            },
-                                            success: function(response) {
-                                                console.log(response);
-                                                console.log('Data stored successfully:', response);
-                                                // Redirect after storing data and hide loader
-                                                window.location.href = scroBtnUrl;
-                                            },
-                                            error: function(xhr, status, error) {
-                                                console.error('Error storing data:', error);
-                                            }
-                                        });
-                                    });
-                                                  
-                                });
-                            }
+                            scroBlocks.find('[data-scro-block1-id]').remove();
+                            scroBlocks.find('[data-scro-block2-id]').attr('data-scro-active-block', true);
                         }
+                        scroWrap.find('.scro-inner-blocks').removeClass('invisible');
+
+                        scroBlock.on('click', 'a', function(event) {
+                            event.preventDefault(); 
+                            
+                            var scroBtnUrl = $(this).attr('href'); 
+                            
+                            var scroID = scroWrap.attr('data-scro-id');
+                            var scroUnquieId = scroWrap.attr('data-scro-unquie-id');
+                            var scroTitle = scroWrap.data('scro-title');
+                            var scroCat = scroWrap.data('scro-cat');
+                            var scroTag = scroWrap.data('scro-tag');
+                            var scroBlock1Title = scroBlock.data('scro-block1-title');
+                            var scroBlock2Title = scroBlock.data('scro-block2-title');
+                            // alert("ok");
+                            $.ajax({
+                                url: scroFrontBlock.ajax_url,
+                                method: 'POST',
+                                data: {
+                                    action: 'handle_scro_click',
+                                    scro_id: scroID,
+                                    scro_unique_id: scroUnquieId,
+                                    scro_title: scroTitle,
+                                    scro_cat: scroCat,
+                                    scro_tag: scroTag,
+                                    scro_block1_id: scroBlock1Id,
+                                    scro_block1_percentage: scroBlock1Perc,
+                                    scro_block1_title: scroBlock1Title,
+                                    scro_block2_id: scroBlock2Id,
+                                    scro_block2_percentage: scroBlock2Perc,
+                                    scro_block2_title: scroBlock2Title,
+                                    scro_page_path: scroPagePath,
+                                    scro_device_type: scroDeviceType,
+                                    scro_button_url: scroBtnUrl,
+                                    scro_nonce: scroFrontBlock.nonce
+                                },
+                                success: function(response) {
+                                    // console.log(response);
+                                    console.log('Data stored successfully:', response);
+                                    // Redirect after storing data and hide loader
+                                    window.location.href = scroBtnUrl;
+                                },
+                                error: function(xhr, status, error) {
+                                    console.error('Error storing data:', error);
+                                }
+                            });
+                        });
                     });
-
-                    // Logic to randomly remove one of the blocks
-                    var scroBlock1Perc = parseInt(scroBlocks.attr('data-scro-block1-perc'));
-                    // var scroBlock2Perc = parseInt(scroBlocks.attr('data-scro-block2-perc'));
-                    var randNum = Math.floor(Math.random() * 100) + 1;
-
-                    if (randNum <= scroBlock1Perc) {
-                        scroBlocks.find('[data-scro-block2-id]').remove();                        
-                        scroBlocks.find('[data-scro-block1-id]').attr('data-scro-active-block', true);
-                    } else {
-                        scroBlocks.find('[data-scro-block1-id]').remove();
-                        scroBlocks.find('[data-scro-block2-id]').attr('data-scro-active-block', true);
-                    }
-                    scroWrap.find('.scro-inner-blocks').removeClass('invisible');
                 }                
             }); 
         } 

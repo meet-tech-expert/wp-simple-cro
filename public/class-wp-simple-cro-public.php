@@ -78,7 +78,7 @@ class Wp_Simple_Cro_Public {
 		));
 	}	
 	// store data in the database
-	function handle_scro_data() {
+	public function handle_scro_click() {
 		global $wpdb;
 	
 		// Nonce verification
@@ -144,6 +144,7 @@ class Wp_Simple_Cro_Public {
 		} else {
 			wp_send_json_success('Data stored successfully.');
 		}
+		wp_die();
 	}
 	
 }

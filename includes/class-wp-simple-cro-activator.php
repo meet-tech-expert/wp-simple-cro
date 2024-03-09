@@ -28,17 +28,17 @@ class Wp_Simple_Cro_Activator {
      */
     public static function activate() {
         global $wpdb;
-
+    
         // Check if custom post type simple_cro exists
         if (post_type_exists(SIMPLE_CRO_CPT)) {
             cro_admin_notice(SIMPLE_CRO_CPT . ' is already exists', 'error');
             deactivate_plugins(plugin_basename(__FILE__));
             return;
         }
-
+    
         $table_name = $wpdb->prefix . 'simple_cro_block';
         $charset_collate = $wpdb->get_charset_collate();
-
+    
         $sql = "CREATE TABLE IF NOT EXISTS $table_name (
             id INT AUTO_INCREMENT PRIMARY KEY,
             scro_id INT NOT NULL COMMENT 'ID of the SCRO',
@@ -55,12 +55,9 @@ class Wp_Simple_Cro_Activator {
             scro_device_type VARCHAR(255) NOT NULL COMMENT 'Type of device used for SCRO',
             scro_page_path VARCHAR(255) NOT NULL COMMENT 'Page path for SCRO',
             scro_btn_url VARCHAR(255) NOT NULL COMMENT 'URL of the button in SCRO',
-            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP COMMENT 'Timestamp indicating when the record was created',
-            UNIQUE KEY `unique_scro_unique_id` (`scro_unique_id`),
-            UNIQUE KEY `unique_block1_id` (`scro_block1_id`),
-            UNIQUE KEY `unique_block2_id` (`scro_block2_id`)
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP 
         ) $charset_collate;";
-
+    
         require_once(ABSPATH . 'wp-admin/includes/upgrade.php');
         dbDelta($sql);
     }
