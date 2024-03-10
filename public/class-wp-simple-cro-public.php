@@ -90,7 +90,7 @@ class Wp_Simple_Cro_Public {
 		$required_fields = array(
 			'scro_id', 'scro_unique_id', 'scro_cat', 'scro_title', 'scro_tag', 'scro_block1_id',
 			'scro_block1_percentage', 'scro_block1_title', 'scro_block2_id', 'scro_block2_percentage',
-			'scro_block2_title', 'scro_device_type', 'scro_page_path', 'scro_button_url', 'scro_block_variation','block_cta_row_column'
+			'scro_block2_title', 'scro_device_type', 'scro_page_path', 'scro_block_variation','block_cta_row_column'
 		);
 	
 		foreach ($required_fields as $field) {
@@ -113,34 +113,36 @@ class Wp_Simple_Cro_Public {
 		$scro_block2_perc = absint($_POST['scro_block2_percentage']);
 		$scro_device_type = sanitize_text_field($_POST['scro_device_type']);
 		$scro_page_path = sanitize_text_field($_POST['scro_page_path']);
-		$scro_btn_url = sanitize_text_field($_POST['scro_button_url']);
 		$scro_block_var = sanitize_text_field($_POST['scro_block_variation']);
 		$block_cta_row_column = sanitize_text_field($_POST['block_cta_row_column']);
+		$block_cta_unique_id = sanitize_text_field($_POST['block_cta_unique_id']);
+		$block_cta_order = absint($_POST['block_cta_order']);
 		// Insert data into the table
-		$table_name = $wpdb->prefix . SIMPLE_CRO_DB ;
+		$table_name = $wpdb->prefix . SIMPLE_CRO_TABLE ;
 	
 		$wpdb->insert(
 			$table_name,
 			array(
-				'scro_id' => $scro_id,
-				'unique_id' => $scro_uid,
-				'title' => $scro_title,
-				'cat' => $scro_cat,
-				'tag' => $scro_tag,
-				'block1_id' => $scro_block1_id,
-				'block1_title' => $scro_block1_title,
-				'block1_perc' => $scro_block1_perc,
-				'block2_id' => $scro_block2_id,
-				'block2_title' => $scro_block2_title,
-				'block2_perc' => $scro_block2_perc,
-				'device_type' => $scro_device_type,
-				'page_path' => $scro_page_path,
-				'btn_url' => $scro_btn_url,
-				'block_variation' => $scro_block_var,
-				'block_cta_row_column' => $block_cta_row_column,
+				'scro_id' 				=> $scro_id,
+				'unique_id' 			=> $scro_uid,
+				'title' 				=> $scro_title,
+				'cat' 					=> $scro_cat,
+				'tag' 					=> $scro_tag,
+				'block1_id' 			=> $scro_block1_id,
+				'block1_title' 			=> $scro_block1_title,
+				'block1_perc' 			=> $scro_block1_perc,
+				'block2_id' 			=> $scro_block2_id,
+				'block2_title' 			=> $scro_block2_title,
+				'block2_perc' 			=> $scro_block2_perc,
+				'device_type' 			=> $scro_device_type,
+				'page_path' 			=> $scro_page_path,
+				'block_variation' 		=> $scro_block_var,
+				'block_cta_row_column' 	=> $block_cta_row_column,
+				'block_cta_unique_id' 	=> $block_cta_unique_id,
+                'block_cta_order' 		=> $block_cta_order,
 			)
 		);
-	
+	//var_dump($wpdb->last_error);
 		// Check if data is inserted successfully
 		if ($wpdb->last_error) {
 			wp_send_json_error('Error storing data: ' . $wpdb->last_error);

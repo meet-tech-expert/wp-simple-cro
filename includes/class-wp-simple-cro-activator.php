@@ -36,7 +36,7 @@ class Wp_Simple_Cro_Activator {
             return;
         }
     
-        $table_name = $wpdb->prefix . SIMPLE_CRO_DB ;
+        $table_name = $wpdb->prefix . SIMPLE_CRO_TABLE ;
         $charset_collate = $wpdb->get_charset_collate();
     
         $sql = "CREATE TABLE IF NOT EXISTS $table_name (
@@ -46,17 +46,18 @@ class Wp_Simple_Cro_Activator {
             title VARCHAR(255) NOT NULL COMMENT 'Title of the SCRO',
             cat VARCHAR(255) NOT NULL COMMENT 'Category of the SCRO',
             tag VARCHAR(255) NOT NULL COMMENT 'Tag of the SCRO',
+            block_variation VARCHAR(5) NOT NULL COMMENT 'Variation of the block in SCRO',
             block1_id VARCHAR(50) NOT NULL COMMENT 'ID of Block 1 in SCRO',
             block1_title VARCHAR(255) NOT NULL COMMENT 'Title of Block 1 in SCRO',
             block1_perc INT NOT NULL COMMENT 'Percentage of Block 1 in SCRO',
             block2_id VARCHAR(50) NOT NULL COMMENT 'ID of Block 2 in SCRO',
             block2_title VARCHAR(255) NOT NULL COMMENT 'Title of Block 2 in SCRO',
             block2_perc INT NOT NULL COMMENT 'Percentage of Block 2 in SCRO',
-            block_cta_row_column INT NOT NULL COMMENT 'CTA of Block in SCRO',
+            block_cta_row_column VARCHAR(50) NOT NULL COMMENT 'CTA of Block in SCRO',
+            block_cta_order INT NOT NULL COMMENT 'CTA order of block in SCRO',
+            block_cta_unique_id varchar(50) NOT NULL COMMENT 'Unique ID of CTA in SCRO',
             device_type VARCHAR(255) NOT NULL COMMENT 'Type of device used for SCRO',
             page_path VARCHAR(255) NOT NULL COMMENT 'Page path for SCRO',
-            btn_url VARCHAR(255) NOT NULL COMMENT 'URL of the button in SCRO',
-            block_variation VARCHAR(5) NOT NULL COMMENT 'Variation of the block in SCRO',
             created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP 
         ) $charset_collate;";
     

@@ -2,7 +2,7 @@
     function handleSimpleCRO() {
 
         var scroWraps = $('.scro-wrapper');
-       
+        var _data = [];
         if (scroWraps.length > 0) {
 
             scroWraps.each(function(index) {
@@ -26,7 +26,7 @@
                         var scroBlock1Id = scroBlock.data('scro-block1-id');
                         var scroBlock2Id = scroBlock.data('scro-block2-id');
                         var scroBlockVar = blockIndex % 2 === 0 ? 'a' : 'b';                   
-                
+                        //console.log(scroBlockVar)
                         scroBlock.attr('data-scro-block-position', blockIndex + 1); 
                         scroBlock.attr('data-scro-block-variation', scroBlockVar); 
                         scroBlock.attr('data-scro-block-unique-id', (scroBlock1Id || scroBlock2Id) + '_' + scroBlockVar + '_' + (blockIndex + 1));
@@ -52,7 +52,7 @@
                                 scroChildBlock.attr('data-scro-block2-unique-id', scroBlock2UnquieId); 
                             }
                         });
-                        
+
                         if (scroBlock.find('.wp-block-columns').length > 0) {
                             var cols = 0, rows = 0;
                             scroBlock.find('.wp-block-columns').each(function(c) {
@@ -67,6 +67,7 @@
                                         } else {
                                             // Anchor tag found, add additional attributes
                                             var rowColumn = anchorTag.data('scro-block-cta-row-column') || 0;
+                                            //console.log(cols,rows)
                                             anchorTag.attr('data-scro-block-cta-row-column', cols + '_' + rows);
                                             anchorTag.attr('data-scro-block-cta-order', rows);
                                             anchorTag.attr('data-scro-block-cta-unique-id', (scroBlock1Id || scroBlock2Id) + '_' + scroBlockVar + '_' + (blockIndex + 1) + '_' + rowColumn + '_' + rows);
@@ -77,19 +78,20 @@
                                 }
                             });
                         }
-
                         var scroCTAs = scroBlock.find('a');
-                            if (scroCTAs.length > 0) {
-                                scroCTAs.each(function(ctaIndex) {
-                                    var scroCTA = $(this);
-                                    var rowColumn = scroCTA.data('row-column') || 0;
-                                    scroCTA.attr('data-scro-block-cta-row-column', rowColumn);
-                                    scroCTA.attr('data-scro-block-cta-order', ctaIndex + 1);
-                                    scroCTA.attr('data-scro-block-cta-unique-id', (scroBlock1Id || scroBlock2Id) + '_' + scroBlockVar + '_' + (blockIndex + 1) + '_' + rowColumn + '_' + (ctaIndex + 1));
-                                    scroCTA.attr('data-scro-cta-page-path', scroPagePath);
-                                    scroCTA.attr('data-scro-cta-device', scroDeviceType);                                                  
-                                });
-                            }                 
+                        if (scroCTAs.length > 0) {
+                            scroCTAs.each(function(ctaIndex) {
+                                var scroCTA = $(this);
+                                if($(this).parents('.wp-block-columns').length === 0){
+                                var rowColumn = scroCTA.data('row-column') || 0;
+                                scroCTA.attr('data-scro-block-cta-row-column', rowColumn);
+                                scroCTA.attr('data-scro-block-cta-order', ctaIndex + 1);
+                                scroCTA.attr('data-scro-block-cta-unique-id', (scroBlock1Id || scroBlock2Id) + '_' + scroBlockVar + '_' + (blockIndex + 1) + '_' + rowColumn + '_' + (ctaIndex + 1));
+                                scroCTA.attr('data-scro-cta-page-path', scroPagePath);
+                                scroCTA.attr('data-scro-cta-device', scroDeviceType); 
+                                }                                                 
+                            });
+                        }
 
                          // Logic to randomly remove one of the blocks
                         var scroBlock1Perc = parseInt(scroBlocks.attr('data-scro-block1-perc'));
@@ -144,10 +146,16 @@
                         }
                         console.log(sequence);
                         // Initialize associative array
-                        let associativeArray = {};
+                        let associativeArray = {};var currentIndex = 0;
                         if (typeof(Storage) !== "undefined") {
-                            let currentIndex = localStorage.getItem("scro_variations_index") || 0;
-
+                            let variationsIndexes = $.parseJSON(localStorage.getItem("scro_variations_index"))
+                            //console.log(variationsIndexes)
+                            if(variationsIndexes !== null) {
+                                let vData = variationsIndexes.find((item) => { return item.id === scroWrap.data('scro-id') })
+                                //console.log(vData)
+                            
+                             currentIndex = vData.index;
+                            }  
                             // Check if currentIndex is within the range of 0 to 10
                             if (currentIndex >= 0 && currentIndex < 10) {
                                 associativeArray[currentIndex] = sequence[currentIndex];
@@ -159,8 +167,10 @@
                             if (currentIndex >= 10) {
                                 currentIndex = 0;
                             }
-
-                            localStorage.setItem("scro_variations_index", currentIndex);
+                            //console.log(scroWrap.data('scro-id'))
+                            _data.push({ id: scroWrap.data('scro-id'), index: currentIndex });
+                            //console.log(_data)
+                            
                         } else {
                             console.log("Sorry, your browser does not support web storage...");
                         }
@@ -171,11 +181,25 @@
                                 scroBlocks.find('[data-scro-block1-id]').show();
                                 scroBlocks.find('[data-scro-block2-id]').hide();
                                 scroBlocks.find('[data-scro-block1-id]').attr('data-scro-active-block', true);
+                                scroBlockVar = "a"
+                                scroWrap.attr('data-scro-variation','a')
+                                let un = scroWrap.attr('data-scro-unique-id').split('_')
+                                scroWrap.attr('data-scro-unique-id', un[0]+'_a_'+un[2] )
+                                scroBlock.attr('data-scro-block-variation', 'a'); 
+                                let blun = scroBlock.attr('data-scro-block-unique-id').split('_')
+                                scroBlock.attr('data-scro-block-unique-id', blun[0]+'_a_'+blun[2] )
                             } else if (associativeArray[index] === 'Block B') {
                                 console.log('B at index ' + index);
                                 scroBlocks.find('[data-scro-block2-id]').show();
                                 scroBlocks.find('[data-scro-block1-id]').hide();
                                 scroBlocks.find('[data-scro-block2-id]').attr('data-scro-active-block', true);
+                                scroBlockVar = "b"
+                                scroWrap.attr('data-scro-variation','b')
+                                let un = scroWrap.attr('data-scro-unique-id').split('_')
+                                scroWrap.attr('data-scro-unique-id', un[0]+'_b_'+un[2] )
+                                scroBlock.attr('data-scro-block-variation', 'b'); 
+                                let blun = scroBlock.attr('data-scro-block-unique-id').split('_')
+                                scroBlock.attr('data-scro-block-unique-id', blun[0]+'_b_'+blun[2] )
                             }
                         });
                         scroWrap.find('.scro-inner-blocks').removeClass('invisible');                       
@@ -191,8 +215,10 @@
                             var scroTag = scroWrap.data('scro-tag');
                             var scroBlock1Title = scroBlock.data('scro-block1-title');
                             var scroBlock2Title = scroBlock.data('scro-block2-title');                            
-                            var scroColRowValue = scroBlock.find('[data-scro-block-cta-row-column]').attr('data-scro-block-cta-row-column');
-                            // console.log(scroColRowValue);                            
+                            var scroColRowValue = $(this).attr('data-scro-block-cta-row-column');
+                            var block_cta_order = $(this).attr('data-scro-block-cta-order');
+                            var block_cta_unique_id = $(this).attr('data-scro-block-cta-unique-id');
+                            //  console.log(scroColRowValue);                            
                             //  alert("ok");
                             if (!scroID || !scroUnquieId || !scroTitle || !scroCat || !scroTag || !scroBlock1Title || !scroBlock2Title || !scroBtnUrl) {
                                 // Display error alert
@@ -217,16 +243,20 @@
                                     scro_block2_title: scroBlock2Title,
                                     scro_page_path: scroPagePath,
                                     scro_device_type: scroDeviceType,
-                                    scro_button_url: scroBtnUrl,
                                     scro_block_variation : scroBlockVar,
                                     block_cta_row_column : scroColRowValue,
+                                    block_cta_order : block_cta_order,
+                                    block_cta_unique_id : block_cta_unique_id,
                                     scro_nonce: scroFrontBlock.nonce
                                 },
                                 success: function(response) {
-                                    // console.log(response);
-                                    console.log('Data stored successfully:', response);
-                                    // Redirect after storing data and hide loader
-                                    window.location.href = scroBtnUrl;
+                                    console.log(response);
+                                    if(response.success){
+                                        // Redirect after storing data and hide loader
+                                        window.location.href = scroBtnUrl;
+                                    }else{
+                                        alert('Error: '+response.data);
+                                    }
                                 },
                                 error: function(xhr, status, error) {
                                     // Display error alert
@@ -238,6 +268,7 @@
                     });
                 }                
             }); 
+            localStorage.setItem("scro_variations_index", JSON.stringify(_data));
         } 
     }
     $(document).ready(function() {
