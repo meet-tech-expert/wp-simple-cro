@@ -101,37 +101,63 @@ class Wp_Simple_Cro_Public {
 	
 		// Insert data into the tables
 		$simple_cro_table = $wpdb->prefix . SIMPLE_CRO_TABLE;
-		$simple_cro_click_table = $wpdb->prefix . SIMPLE_CRO_CLICK_TABLE ;
-	
-		$inserted_into_simple_cro = $wpdb->insert(
-			$simple_cro_table,
-			array(
-				'scro_id' => sanitize_text_field($_POST['scro_id']),
-				'unique_id' => sanitize_text_field($_POST['scro_unique_id']),
-				'title' => sanitize_text_field($_POST['scro_title']),
-				'cat' => sanitize_text_field($_POST['scro_cat']),
-				'tag' => sanitize_text_field($_POST['scro_tag']),
-				'block1_id' => sanitize_text_field($_POST['scro_block1_id']),
-				'block1_title' => sanitize_text_field($_POST['scro_block1_title']),
-				'block1_perc' => absint($_POST['scro_block1_percentage']),
-				'block2_id' => sanitize_text_field($_POST['scro_block2_id']),
-				'block2_title' => sanitize_text_field($_POST['scro_block2_title']),
-				'block2_perc' => absint($_POST['scro_block2_percentage'])
-			)
-		);
-	
-		$inserted_into_simple_cro_click = $wpdb->insert(
-			$simple_cro_click_table,
-			array(
-				'device_type' => sanitize_text_field($_POST['scro_device_type']),
-				'page_path' => sanitize_text_field($_POST['scro_page_path']),
-				'block_variation' => sanitize_text_field($_POST['scro_block_variation']),
-				'block_cta_row_column' => sanitize_text_field($_POST['block_cta_row_column']),
-				'block_cta_unique_id' => sanitize_text_field($_POST['block_cta_unique_id']),
-				'block_cta_order' => absint($_POST['block_cta_order'])
-			)
-		);
-		if ($inserted_into_simple_cro && $inserted_into_simple_cro_click) {
+		$simple_cro_click_table = $wpdb->prefix . SIMPLE_CRO_CLICK_TABLE;
+		$scroId = sanitize_text_field($_POST['scro_id']);
+		$sql = "SELECT id,scro_id FROM $simple_cro_table WHERE `scro_id` = '$scroId'";
+		$res = $wpdb->get_row($sql);
+		$flag = false;
+		if(null !== $res){
+			//var_dump($res->id);exit;
+			$inserted_into_simple_cro_click = $wpdb->insert(
+				$simple_cro_click_table,
+				array(
+					'cro_id' => $res->id,
+					'device_type' => sanitize_text_field($_POST['scro_device_type']),
+					'page_path' => sanitize_text_field($_POST['scro_page_path']),
+					'block_variation' => sanitize_text_field($_POST['scro_block_variation']),
+					'block_cta_row_column' => sanitize_text_field($_POST['block_cta_row_column']),
+					'block_cta_unique_id' => sanitize_text_field($_POST['block_cta_unique_id']),
+					'block_cta_order' => absint($_POST['block_cta_order'])
+				)
+			);
+			if(!is_wp_error($inserted_into_simple_cro_click)){
+				$flag = true;
+			}
+		}else{
+			$inserted_into_simple_cro = $wpdb->insert(
+				$simple_cro_table,
+				array(
+					'scro_id' => $scroId,
+					'unique_id' => sanitize_text_field($_POST['scro_unique_id']),
+					'title' => sanitize_text_field($_POST['scro_title']),
+					'cat' => sanitize_text_field($_POST['scro_cat']),
+					'tag' => sanitize_text_field($_POST['scro_tag']),
+					'block1_id' => sanitize_text_field($_POST['scro_block1_id']),
+					'block1_title' => sanitize_text_field($_POST['scro_block1_title']),
+					'block1_perc' => absint($_POST['scro_block1_percentage']),
+					'block2_id' => sanitize_text_field($_POST['scro_block2_id']),
+					'block2_title' => sanitize_text_field($_POST['scro_block2_title']),
+					'block2_perc' => absint($_POST['scro_block2_percentage'])
+				)
+			);
+			$lastid = $wpdb->insert_id;
+			$inserted_into_simple_cro_click = $wpdb->insert(
+				$simple_cro_click_table,
+				array(
+					'cro_id' => $lastid,
+					'device_type' => sanitize_text_field($_POST['scro_device_type']),
+					'page_path' => sanitize_text_field($_POST['scro_page_path']),
+					'block_variation' => sanitize_text_field($_POST['scro_block_variation']),
+					'block_cta_row_column' => sanitize_text_field($_POST['block_cta_row_column']),
+					'block_cta_unique_id' => sanitize_text_field($_POST['block_cta_unique_id']),
+					'block_cta_order' => absint($_POST['block_cta_order'])
+				)
+			);
+			if(!is_wp_error($inserted_into_simple_cro)){
+				$flag = true;
+			}
+		}
+		if ($flag) {
 			wp_send_json_success('Data inserted into both tables successfully.');
 		} else {
 			wp_send_json_error('Error inserting data into tables.');
