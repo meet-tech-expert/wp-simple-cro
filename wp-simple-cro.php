@@ -39,6 +39,7 @@ define( 'WP_SIMPLE_CRO_VERSION', '1.0.0' );
 //Custom Post Type Constant
 define( 'SIMPLE_CRO_CPT', 'simple_cro' );
 define( 'SIMPLE_CRO_TABLE', 'simple_cro_block' );
+define( 'SIMPLE_CRO_CLICK_TABLE', 'simple_cro_block_clicks' );
 
 /**
  * The code that runs during plugin activation.

@@ -12,6 +12,6 @@
  * @param string $sql SQL statement for creating or updating tables.
  * @return mixed Boolean true on success, otherwise false.
  */
-function dbDelta($sql) {
+function dbDelta($combined_sql) {
     return true;
 }

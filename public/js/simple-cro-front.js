@@ -117,31 +117,34 @@
                         // Calculate the number of times each block should appear
                         let countA = Math.round((percentageA / 100) * totalDisplays);
                         let countB = Math.round((percentageB / 100) * totalDisplays);
-
-                        // Generate the sequence
+                        console.log('A',countA);console.log('B',countB);
                         const sequence = [];
+                        const initialElement = countA > countB ? 'Block A' : 'Block B';
+                        console.log(initialElement);
 
-                        for (let i = 0; i < totalDisplays; i++) {
-                            if (i === 0 && countB > 0) {
+                        // Start with the block of higher weight
+                        if (initialElement === 'Block A') {
+                            sequence.push('Block A');
+                            countA--;
+                        } else {
+                            sequence.push('Block B');
+                            countB--;
+                        }
+
+                        for (let i = 1; i < totalDisplays; i++) {
+                            // Alternate between blocks
+                            if (sequence[i - 1] === 'Block A' && countB > 0) {
                                 sequence.push('Block B');
                                 countB--;
-                            } else if (i === 1 && countA > 0) {
+                            } else if (sequence[i - 1] === 'Block B' && countA > 0) {
                                 sequence.push('Block A');
                                 countA--;
-                            } else if (sequence[i - 2] === 'Block B' && countA > 0) {
+                            } else if (countA > 0) {
                                 sequence.push('Block A');
                                 countA--;
-                            } else if (sequence[i - 2] === 'Block A' && countB > 0) {
+                            } else if (countB > 0) {
                                 sequence.push('Block B');
                                 countB--;
-                            } else {
-                                if (countB > 0) {
-                                    sequence.push('Block B');
-                                    countB--;
-                                } else {
-                                    sequence.push('Block A');
-                                    countA--;
-                                }
                             }
                         }
                         console.log(sequence);
