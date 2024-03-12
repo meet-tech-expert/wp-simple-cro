@@ -132,7 +132,7 @@ class Wp_Simple_Cro {
 		/** 
 		 * The class responsible for handling simple cro block post list.
 		 */
-		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/class-wp-simple-cro-test.php';
+		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/class-wp-simple-cro-admin-list.php';
 
 
 		$this->loader = new Wp_Simple_Cro_Loader();

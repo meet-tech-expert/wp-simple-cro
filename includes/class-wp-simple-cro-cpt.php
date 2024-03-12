@@ -106,30 +106,39 @@ class Wp_Simple_CRO_CPT {
     public function add_cpt_submenu() {
         add_submenu_page(
             'edit.php?post_type=simple_cro', 
-            'CRO test',               
-            'CRO test',                
+            'CRO Block List',               
+            'CRO Block List',                
             'manage_options',                 
-            'simple-cro-test', 
-            array( $this, 'display_simple_cro_test_page' )
+            'simple-cro-list', 
+            array( $this, 'display_simple_cro_list_page' )
         );
     }  
 
-    function display_simple_cro_test_page() {
+    function display_simple_cro_list_page() {
+        global $wpdb;
+        $listTable = new Wp_Simple_CRO_Admin_List($this->plugin_name);
+        $listTable->prepare_items();
 
-        $table = new Wp_Simple_CRO_Admin_List();
-        echo '<div class="wrap"><h2>Simple Cro List Table</h2>';
-    
-        // Display search box
-        echo '<form method="get">';
-        $table->search_box('Search', 'search-id');
-        echo '</form>';
-    
-        // Prepare and display table
-        $table->prepare_items();
-        // Display bulk actions dropdown
-        echo '<form method="post">';
-        $table->display();
-        echo '</form>';    
-        echo '</div>';
+        $message = '';
+        if ('delete' === $listTable->current_action()) {
+            $message = '<div class="updated below-h2" id="message"><p>' . sprintf(__('Items deleted: %d', $this->plugin_name), count($_REQUEST['id'])) . '</p></div>';
+        }
+        ?>
+        <div class="wrap">
+
+            <div class="icon32 icon32-posts-post" id="icon-edit"><br></div>
+            <h2><?php _e('CRO Block List', $this->plugin_name)?></h2>
+            <?php echo $message; ?>
+        
+            <form method="GET">
+                <input type="hidden" name="page" value="<?php echo $_REQUEST['page'] ?>"/>
+                <?php 
+                $listTable->search_box('Search Block List', 'search-id');
+                $listTable->display();
+                ?>
+            </form>
+
+        </div>
+    <?php
     }
 }
