@@ -109,97 +109,27 @@ class Wp_Simple_CRO_CPT {
             'CRO test',               
             'CRO test',                
             'manage_options',                 
-            'simple-cro-test',                
-            array( $this, 'display_simple_cro_test_page' ) 
+            'simple-cro-test', 
+            array( $this, 'display_simple_cro_test_page' )
         );
+    }  
+
+    function display_simple_cro_test_page() {
+
+        $table = new Wp_Simple_CRO_Admin_List();
+        echo '<div class="wrap"><h2>Simple Cro List Table</h2>';
+    
+        // Display search box
+        echo '<form method="get">';
+        $table->search_box('Search', 'search-id');
+        echo '</form>';
+    
+        // Prepare and display table
+        $table->prepare_items();
+        // Display bulk actions dropdown
+        echo '<form method="post">';
+        $table->display();
+        echo '</form>';    
+        echo '</div>';
     }
-    public function display_simple_cro_test_page() {
-        $args = array(
-            'post_type'      => 'simple_cro',
-            'posts_per_page' => -1, // Retrieve all posts
-            'post_status'    => 'publish', // Retrieve only published posts
-        );
-    
-        $cro_query = new WP_Query( $args );
-    
-        // Check if there are any Simple CRO posts
-        if ( $cro_query->have_posts() ) {
-            // Start outputting the list
-            echo '<div class="wrap">';
-            echo '<h1 class="wp-heading-inline">CRO Tests</h1>';
-    
-            // Start table
-            echo '<table class="wp-list-table widefat striped">';
-            echo '<thead>';
-            echo '<tr>';
-            echo '<th scope="col" class="manage-column column-title">Title</th>';
-            echo '<th scope="col" class="manage-column column-categories">Categories</th>';
-            echo '<th scope="col" class="manage-column column-tags">Tags</th>';
-            echo '<th scope="col" class="manage-column column-date">Date</th>';
-            echo '<th scope="col" class="manage-column column-winning">Winning Block</th>';
-            echo '</tr>';
-            echo '</thead>';
-            echo '<tbody id="the-list">';
-    
-            // Loop through each Simple CRO post
-            while ( $cro_query->have_posts() ) {
-                $cro_query->the_post();
-                $post_id = get_the_ID();
-                $cro_title = get_the_title();
-                $cro_categories = get_the_category();
-                $cro_tags = get_the_tags();
-                $cro_date = get_the_date();
-    
-                // Calculate the winning block (you need to implement this logic)
-                $winning_block = "Block A"; // Replace with your actual logic to determine the winning block
-    
-                // Output list item for each Simple CRO post
-                echo '<tr id="post-' . $post_id . '" class="iedit author-self level-0 post-' . $post_id . ' type-post status-publish format-standard hentry">';
-                echo '<td class="title column-title has-row-actions column-primary page-title" data-colname="Title">' . $cro_title;
-                echo '<div class="row-actions">';
-                echo '<span class="edit">';
-                echo '<a href="' . get_edit_post_link( $post_id ) . '" aria-label="Edit “' . $cro_title . '”">Edit</a> | ';
-                echo '</span>';
-                echo '<span class="trash">';
-                echo '<a href="' . get_delete_post_link( $post_id ) . '" class="submitdelete" aria-label="Move “' . $cro_title . '” to the Trash">Trash</a> | ';
-                echo '</span>';
-                echo '<span class="view">';
-                echo '<a href="' . get_permalink( $post_id ) . '" aria-label="View “' . $cro_title . '”">View</a>';
-                echo '</span>';
-                echo '</div>';
-                echo '</td>';
-                echo '<td class="categories column-categories" data-colname="Categories">';
-                if ( ! empty( $cro_categories ) ) {
-                    foreach ( $cro_categories as $category ) {
-                        echo $category->name . ', ';
-                    }
-                }
-                echo '</td>';
-                echo '<td class="tags column-tags" data-colname="Tags">';
-                if ( ! empty( $cro_tags ) ) {
-                    foreach ( $cro_tags as $tag ) {
-                        echo $tag->name . ', ';
-                    }
-                }
-                echo '</td>';
-                echo '<td class="date column-date" data-colname="Date">' . $cro_date . '</td>';
-                echo '<td class="winning column-winning" data-colname="Winning Block">' . $winning_block . '</td>';
-                echo '</tr>';
-            }
-    
-            // End of the list
-            echo '</tbody>';
-            echo '</table>';
-            echo '</div>';
-    
-            wp_reset_postdata(); // Restore original post data
-        } else {
-            echo '<div class="wrap">';
-            echo '<h1 class="wp-heading-inline">CRO Tests</h1>';
-            echo '<p>No Simple CRO posts found.</p>';
-            echo '</div>';
-        }
-    }
-    
-    
 }
