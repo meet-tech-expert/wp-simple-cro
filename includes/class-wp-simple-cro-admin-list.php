@@ -44,7 +44,7 @@ class Wp_Simple_CRO_Admin_List extends WP_List_Table {
     public function column_title($item) {
         //print_r($item);
         $actions = array(
-            'view'      => sprintf('<a href="?page=view_post&id=%s">%s</a>', $item['id'], __('View', $this->plugin_name)),
+            'view'      => sprintf('<a href="?post_type=simple_cro&page=simple-cro-list&id=%s">%s</a>', $item['id'], __('View', $this->plugin_name)),
             'delete'    => sprintf('<a href="?post_type=simple_cro&page=simple-cro-list&action=delete&id=%s">%s</a>', $item['id'], __('Delete', $this->plugin_name)),
         );
         return sprintf('%1$s %2$s', $item['title'], $this->row_actions($actions));
@@ -149,5 +149,79 @@ class Wp_Simple_CRO_Admin_List extends WP_List_Table {
             'total_pages'   => ceil($total_items / $per_page) // calculate pages count
         ));        
     }
+    public function display_view_form() {
+        if (isset($_GET['id'])) {
+            $item_id = $_GET['id'];
+            
+            global $wpdb;
+            $simple_cro_table = $wpdb->prefix . SIMPLE_CRO_TABLE;
+            $simple_cro_click_table = $wpdb->prefix . SIMPLE_CRO_CLICK_TABLE;
+            $query = $wpdb->prepare("SELECT * FROM $simple_cro_table WHERE id = %d", $item_id);
+            $item_data = $wpdb->get_row($query, ARRAY_A);
+            ?>
+            <div class="wrap">
+                <h1 class="wp-heading-inline"><?php _e('Edit Simple CRO Test', $this->plugin_name)?></h1>
+                <form method="get" action="">
+                    <!-- Display item title with full width -->
+                    <input type="text" name="item_title" value="<?php echo esc_attr($item_data['title']); ?>" style="width: 100%; background-color: #fff; font-size: 22px;" readonly>
+                   
+                </form>
+                
+                <!-- Tabs for Live Results and Settings -->
+                <div class="nav-tab-wrapper">
+                    <a href="#live-results" class="nav-tab"><?php _e('Live Results', $this->plugin_name)?></a>
+                    <a href="#settings" class="nav-tab"><?php _e('Settings', $this->plugin_name)?></a>
+                </div>
     
+                <!-- Tab content with white background -->
+                <div id="live-results" class="tab-content" style="background-color: #fff;">
+                    <!-- Live Results content goes here -->
+                </div>
+    
+                <div id="settings" class="tab-content" style="background-color: #fff;">
+                    <label for="cro_test_id"><?php _e('CRO Test ID:', $this->plugin_name) ?></label>
+                    <input type="text" id="cro_test_id" value="<?php echo $item_data['id']; ?>" readonly>
+
+                    <label for="cro_categories"><?php _e('CRO Categories:', $this->plugin_name) ?></label>
+                    <input type="text" id="cro_categories" value="<?php echo $item_data['cat']; ?>" readonly>
+
+                    <label for="cro_tags"><?php _e('CRO Tags:', $this->plugin_name) ?></label>
+                    <input type="text" id="cro_tags" value="<?php echo $item_data['tag']; ?>" readonly>
+
+                    <label for="block_a_title"><?php _e('Block A Title:', $this->plugin_name) ?></label>
+                    <input type="text" id="block_a_title" value="<?php echo $item_data['block1_title']; ?>" readonly>
+
+                    <label for="block_a_id"><?php _e('Block A ID:', $this->plugin_name) ?></label>
+                    <input type="text" id="block_a_id" value="<?php echo $item_data['block1_id']; ?>" readonly>
+
+                    <label for="block_b_title"><?php _e('Block B Title:', $this->plugin_name) ?></label>
+                    <input type="text" id="block_b_title" value="<?php echo $item_data['block2_title']; ?>" readonly>
+
+                    <label for="block_b_id"><?php _e('Block B ID:', $this->plugin_name) ?></label>
+                    <input type="text" id="block_b_id" value="<?php echo $item_data['block2_id']; ?>" readonly>
+                </div>
+                <style>
+                label {
+                    display: block; 
+                    margin-bottom: 5px; 
+                    font-weight: bold; 
+                }
+                input[type="text"] {
+                    width: 50%; 
+                    padding: 5px; 
+                    margin-bottom: 10px; 
+                    border: 1px solid #ccc; 
+                    border-radius: 4px; 
+                    box-sizing: border-box; 
+                }
+                .tab-content {
+                    padding: 20px; 
+                }
+                </style>
+            </div> 
+                <?php
+        } else {
+            echo '<p>' . __('Invalid item ID.', $this->plugin_name) . '</p>';
+        }          
+    }   
 }

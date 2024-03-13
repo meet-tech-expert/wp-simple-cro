@@ -113,34 +113,37 @@ class Wp_Simple_CRO_CPT {
             array( $this, 'display_simple_cro_list_page' )
         );
     }  
-
     function display_simple_cro_list_page() {
         global $wpdb;
         $listTable = new Wp_Simple_CRO_Admin_List($this->plugin_name);
         $listTable->prepare_items();
-
+    
         $message = '';
         if ('delete' === $listTable->current_action()) {
             $message = '<div class="updated below-h2" id="message"><p>' . sprintf(__('Items deleted: %d', $this->plugin_name), count($_REQUEST['id'])) . '</p></div>';
         }
-        ?>
-        <div class="wrap">
-
-            <div class="icon32 icon32-posts-post" id="icon-edit"><br></div>
-            <h2><?php _e('CRO Block List', $this->plugin_name)?></h2>
-            <?php echo $message; ?>
-            
+    
+        if (isset($_GET['id'])) {                
+            // If 'id' parameter is set, display the view form
+            $listTable->display_view_form();                
+        } else {
+            // If 'id' parameter is not set, display the CRO test table
+            ?>
+            <div class="wrap">
+                <div class="icon32 icon32-posts-post" id="icon-edit"><br></div> 
+                <h1 class="wp-heading-inline"><?php _e('CRO Block List', $this->plugin_name)?></h1>
+                <?php echo $message; ?>
                 <form method="get" action="">
                     <input type="hidden" name="post_type" value="simple_cro">
                     <input type="hidden" name="page" value="simple-cro-list">
                     <?php
-                        $listTable->search_box('Search Block List', 'search-block');
+                    $listTable->search_box('Search Block List', 'search-block');
                     ?>
-                </form>
-            <?php
-                $listTable->display();
-            ?>
-        </div>
-    <?php
+                </form>                
+                <?php $listTable->display(); ?>
+            </div>
+            <?php           
+        }  
     }
+      
 }
