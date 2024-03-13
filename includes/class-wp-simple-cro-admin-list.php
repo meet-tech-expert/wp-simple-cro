@@ -34,7 +34,7 @@ class Wp_Simple_CRO_Admin_List extends WP_List_Table {
             case 'date':
                 return isset($item['created_at']) ? "Published <br/>".date('Y/m/d h:i a', strtotime($item['created_at'])) : '';
             case 'winning':
-                return isset($item['winning_block_title']) ? $item['winning_block_title'] : '';
+                return isset($item['winning_block_title']) ? $item['winning_block_title'] : '';                               
             default:
                 return isset($item[$column_name]) ? $item[$column_name] : '';
         }
@@ -123,17 +123,33 @@ class Wp_Simple_CRO_Admin_List extends WP_List_Table {
         $total_items = $wpdb->get_var("SELECT COUNT(id) FROM $simple_cro_table");
 
         // Handle search query
-        if (isset($_REQUEST['s'])) {
-            $search = sanitize_text_field($_REQUEST['s']);
-            $query .= " AND title LIKE '%$search%'";
-        }
+        // if (isset($_REQUEST['s'])) {
+        //     $search = sanitize_text_field($_REQUEST['s']);
+        //     $query .= " AND title LIKE '%$search%'";
+        // }
         // prepare query params, as usual current page, order by and order direction
         $paged = isset($_REQUEST['paged']) ? max(0, intval($_REQUEST['paged'] - 1) * $per_page) : 0;
         $orderby = (isset($_REQUEST['orderby']) && in_array($_REQUEST['orderby'], array_keys($this->get_sortable_columns()))) ? $_REQUEST['orderby'] : 'created_at';
         $order = (isset($_REQUEST['order']) && in_array($_REQUEST['order'], array('asc', 'desc'))) ? $_REQUEST['order'] : 'desc';
 
-        $this->items = $wpdb->get_results($wpdb->prepare("SELECT * FROM $simple_cro_table ORDER BY $orderby $order LIMIT %d OFFSET %d", $per_page, $paged), ARRAY_A);
-
+        $this->items = $wpdb->get_results($wpdb->prepare("SELECT sct.id, sct.title, sct.cat, sct.tag, sct.created_at,
+            SUM(CASE WHEN scc.block_variation = 'a' THEN 1 ELSE 0 END) AS count_a,
+            SUM(CASE WHEN scc.block_variation = 'b' THEN 1 ELSE 0 END) AS count_b,
+            CASE 
+                WHEN SUM(CASE WHEN scc.block_variation = 'a' THEN 1 ELSE 0 END) > SUM(CASE WHEN scc.block_variation = 'b' THEN 1 ELSE 0 END) THEN sct.block1_title 
+                ELSE sct.block2_title 
+            END AS winning_block_title 
+        FROM 
+            $simple_cro_table AS sct 
+        INNER JOIN 
+            $simple_cro_click_table AS scc ON sct.id = scc.cro_id 
+        GROUP BY 
+            sct.id 
+        ORDER BY 
+            $orderby $order 
+        LIMIT 
+            %d OFFSET %d", $per_page, $paged), ARRAY_A);
+      
         //print_r($this->items);
          // [REQUIRED] configure pagination
          $this->set_pagination_args(array(
