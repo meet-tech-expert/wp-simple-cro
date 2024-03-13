@@ -129,15 +129,17 @@ class Wp_Simple_CRO_CPT {
             <div class="icon32 icon32-posts-post" id="icon-edit"><br></div>
             <h2><?php _e('CRO Block List', $this->plugin_name)?></h2>
             <?php echo $message; ?>
-        
-            <form method="GET">
-                <input type="hidden" name="page" value="<?php echo $_REQUEST['page'] ?>"/>
-                <?php 
-                $listTable->search_box('Search Block List', 'search-id');
+            
+                <form method="get" action="">
+                    <input type="hidden" name="post_type" value="simple_cro">
+                    <input type="hidden" name="page" value="simple-cro-list">
+                    <?php
+                        $listTable->search_box('Search Block List', 'search-block');
+                    ?>
+                </form>
+            <?php
                 $listTable->display();
-                ?>
-            </form>
-
+            ?>
         </div>
     <?php
     }

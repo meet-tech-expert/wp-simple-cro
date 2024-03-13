@@ -100,8 +100,7 @@ class Wp_Simple_CRO_Admin_List extends WP_List_Table {
             }
         }
     }
-
-    // Prepare items for the table
+        // Prepare items for the table
     public function prepare_items() {
         global $wpdb;
 
@@ -122,42 +121,33 @@ class Wp_Simple_CRO_Admin_List extends WP_List_Table {
         // will be used in pagination settings
         $total_items = $wpdb->get_var("SELECT COUNT(id) FROM $simple_cro_table");
 
-        // Handle search query
-        // if (isset($_REQUEST['s'])) {
-        //     $search = sanitize_text_field($_REQUEST['s']);
-        //     $query .= " AND title LIKE '%$search%'";
-        // }
+        // Handle search query   
+        $search_query = isset($_REQUEST['s']) ? sanitize_text_field($_REQUEST['s']) : '';
+  
+
         // prepare query params, as usual current page, order by and order direction
         $paged = isset($_REQUEST['paged']) ? max(0, intval($_REQUEST['paged'] - 1) * $per_page) : 0;
         $orderby = (isset($_REQUEST['orderby']) && in_array($_REQUEST['orderby'], array_keys($this->get_sortable_columns()))) ? $_REQUEST['orderby'] : 'created_at';
         $order = (isset($_REQUEST['order']) && in_array($_REQUEST['order'], array('asc', 'desc'))) ? $_REQUEST['order'] : 'desc';
+        $query = "SELECT sct.id, sct.title, sct.cat, sct.tag, sct.created_at, SUM(CASE WHEN scc.block_variation = 'a' THEN 1 ELSE 0 END) AS count_a,SUM(CASE WHEN scc.block_variation = 'b' THEN 1 ELSE 0 END) AS count_b,CASE WHEN SUM(CASE WHEN scc.block_variation = 'a' THEN 1 ELSE 0 END) > SUM(CASE WHEN scc.block_variation = 'b' THEN 1 ELSE 0 END) THEN sct.block1_title ELSE sct.block2_title END AS winning_block_title FROM $simple_cro_table AS sct INNER JOIN $simple_cro_click_table AS scc ON sct.id = scc.cro_id ";
 
-        $this->items = $wpdb->get_results($wpdb->prepare("SELECT sct.id, sct.title, sct.cat, sct.tag, sct.created_at,
-            SUM(CASE WHEN scc.block_variation = 'a' THEN 1 ELSE 0 END) AS count_a,
-            SUM(CASE WHEN scc.block_variation = 'b' THEN 1 ELSE 0 END) AS count_b,
-            CASE 
-                WHEN SUM(CASE WHEN scc.block_variation = 'a' THEN 1 ELSE 0 END) > SUM(CASE WHEN scc.block_variation = 'b' THEN 1 ELSE 0 END) THEN sct.block1_title 
-                ELSE sct.block2_title 
-            END AS winning_block_title 
-        FROM 
-            $simple_cro_table AS sct 
-        INNER JOIN 
-            $simple_cro_click_table AS scc ON sct.id = scc.cro_id 
-        GROUP BY 
-            sct.id 
-        ORDER BY 
-            $orderby $order 
-        LIMIT 
-            %d OFFSET %d", $per_page, $paged), ARRAY_A);
-      
+        // Add search conditions to the query if a search query is provided
+        if (!empty($search_query)) {
+            $query .= $wpdb->prepare("WHERE (title LIKE '%%%s%%' OR cat LIKE '%%%s%%' OR tag LIKE '%%%s%%')", $search_query, $search_query, $search_query);
+        }
+        // Append sorting and pagination clauses to the query
+        $query .= " GROUP BY sct.id ORDER BY $orderby $order LIMIT $per_page OFFSET $paged";
+
+        // Execute the query
+        $this->items = $wpdb->get_results($query, ARRAY_A);
+       
         //print_r($this->items);
          // [REQUIRED] configure pagination
          $this->set_pagination_args(array(
             'total_items'   => $total_items, // total items defined above
             'per_page'      => $per_page, // per page constant defined at top of method
             'total_pages'   => ceil($total_items / $per_page) // calculate pages count
-        ));
-
-        
+        ));        
     }
+    
 }
