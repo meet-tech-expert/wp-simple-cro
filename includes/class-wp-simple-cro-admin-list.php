@@ -34,7 +34,7 @@ class Wp_Simple_CRO_Admin_List extends WP_List_Table {
             case 'date':
                 return isset($item['created_at']) ? "Published <br/>".date('Y/m/d h:i a', strtotime($item['created_at'])) : '';
             case 'winning':
-                return isset($item->winning_block_title) ? $item->winning_block_title : '';
+                return isset($item['winning_block_title']) ? $item['winning_block_title'] : '';
             default:
                 return isset($item[$column_name]) ? $item[$column_name] : '';
         }
@@ -44,7 +44,6 @@ class Wp_Simple_CRO_Admin_List extends WP_List_Table {
     public function column_title($item) {
         //print_r($item);
         $actions = array(
-            'edit'      => sprintf('<a href="?page=edit_post&id=%s">%s</a>', $item['id'], __('Edit', $this->plugin_name)),
             'view'      => sprintf('<a href="?page=view_post&id=%s">%s</a>', $item['id'], __('View', $this->plugin_name)),
             'delete'    => sprintf('<a href="?post_type=simple_cro&page=simple-cro-list&action=delete&id=%s">%s</a>', $item['id'], __('Delete', $this->plugin_name)),
         );
@@ -134,6 +133,7 @@ class Wp_Simple_CRO_Admin_List extends WP_List_Table {
         $order = (isset($_REQUEST['order']) && in_array($_REQUEST['order'], array('asc', 'desc'))) ? $_REQUEST['order'] : 'desc';
 
         $this->items = $wpdb->get_results($wpdb->prepare("SELECT * FROM $simple_cro_table ORDER BY $orderby $order LIMIT %d OFFSET %d", $per_page, $paged), ARRAY_A);
+
         //print_r($this->items);
          // [REQUIRED] configure pagination
          $this->set_pagination_args(array(
