@@ -9,38 +9,29 @@
  * @subpackage Wp_Simple_Cro/includes
  */
 
-/**
- * Fired during plugin activation.
- *
- * This class defines all code necessary to run during the plugin's activation.
- *
- * @since      1.0.0
- * @package    Wp_Simple_Cro
- * @subpackage Wp_Simple_Cro/includes
- * @author     Rinkesh Gupta <gupta.rinkesh1990@gmail.com>
- */
-class Wp_Simple_Cro_Activator {
+ class Wp_Simple_Cro_Activator {
 
     /**
      * Activate the plugin.
      *
      * This method is called when the plugin is activated.
      */
-
     public static function activate() {
+        ob_start(); // Start output buffering to capture any output
+    
         global $wpdb;
-
+    
         // Check if custom post type simple_cro exists
         if (post_type_exists(SIMPLE_CRO_CPT)) {
             cro_admin_notice(SIMPLE_CRO_CPT . ' already exists', 'error');
             deactivate_plugins(plugin_basename(__FILE__));
             return;
         }
-
-        $simple_cro_table = $wpdb->prefix . SIMPLE_CRO_TABLE ;
-        $simple_cro_click_table = $wpdb->prefix . SIMPLE_CRO_CLICK_TABLE ;
+    
+        $simple_cro_table = $wpdb->prefix . SIMPLE_CRO_TABLE;
+        $simple_cro_click_table = $wpdb->prefix . SIMPLE_CRO_CLICK_TABLE;
         $charset_collate = $wpdb->get_charset_collate();
-
+    
         // SQL query to create the first table
         $sql = "CREATE TABLE IF NOT EXISTS $simple_cro_table (
             id INT AUTO_INCREMENT PRIMARY KEY,
@@ -57,7 +48,7 @@ class Wp_Simple_Cro_Activator {
             block2_perc INT NOT NULL COMMENT 'Percentage of Block 2 in SCRO',
             created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP 
         ) $charset_collate;";
-
+    
         // SQL query to create the second table
         $sql1 = "CREATE TABLE IF NOT EXISTS $simple_cro_click_table (
             id INT AUTO_INCREMENT PRIMARY KEY,
@@ -70,17 +61,11 @@ class Wp_Simple_Cro_Activator {
             page_path VARCHAR(255) NOT NULL COMMENT 'Page path for SCRO',
             add_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP
         ) $charset_collate;";
-
-        // Include WordPress upgrade functions
-        // require_once(ABSPATH . 'wp-admin/includes/upgrade.php');
-
-        // // Combine both SQL queries into one string
-        // $combined_sql = $sql . ';' . $sql1;
-
-        // // Execute both SQL queries together
-        // dbDelta($combined_sql);
-        
+    
+        // Execute SQL queries
         $wpdb->query($sql);
         $wpdb->query($sql1);
-    }
+    
+        ob_end_clean(); // End output buffering and discard any captured output
+    }    
 }

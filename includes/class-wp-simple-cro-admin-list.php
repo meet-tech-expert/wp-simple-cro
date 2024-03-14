@@ -42,9 +42,8 @@ class Wp_Simple_CRO_Admin_List extends WP_List_Table {
 
     // Rendering column with title and actions
     public function column_title($item) {
-        //print_r($item);
         $actions = array(
-            'view'      => sprintf('<a href="?post_type=simple_cro&page=simple-cro-list&id=%s">%s</a>', $item['id'], __('View', $this->plugin_name)),
+            'view'      => sprintf('<a href="?post_type=simple_cro&page=simple-cro-list&action=view&id=%s">%s</a>', $item['id'], __('View', $this->plugin_name)),
             'delete'    => sprintf('<a href="?post_type=simple_cro&page=simple-cro-list&action=delete&id=%s">%s</a>', $item['id'], __('Delete', $this->plugin_name)),
         );
         return sprintf('%1$s %2$s', $item['title'], $this->row_actions($actions));
@@ -89,7 +88,7 @@ class Wp_Simple_CRO_Admin_List extends WP_List_Table {
         global $wpdb;
         $simple_cro_table       = $wpdb->prefix . SIMPLE_CRO_TABLE;
 		$simple_cro_click_table = $wpdb->prefix . SIMPLE_CRO_CLICK_TABLE;
-        //var_dump($this->current_action());
+
         if ('delete' === $this->current_action()) {
             $ids = isset($_REQUEST['id']) ? $_REQUEST['id'] : array();
             if (is_array($ids)) $ids = implode(',', $ids);
@@ -100,128 +99,295 @@ class Wp_Simple_CRO_Admin_List extends WP_List_Table {
             }
         }
     }
-        // Prepare items for the table
+    
+    // Prepare items for the table
     public function prepare_items() {
         global $wpdb;
 
-        // Define column headers, hidden columns, and sortable columns
         $columns = $this->get_columns();
         $hidden = array();
         $sortable = $this->get_sortable_columns();
-        $per_page = 20; // constant, how much records will be shown per page
+        $per_page = 20;
         $simple_cro_table = $wpdb->prefix . SIMPLE_CRO_TABLE;
 		$simple_cro_click_table = $wpdb->prefix . SIMPLE_CRO_CLICK_TABLE;
 
-        // Set column headers
         $this->_column_headers = array($columns, $hidden, $sortable);
 
-        // [OPTIONAL] process bulk action if any
         $this->process_bulk_action();
 
-        // will be used in pagination settings
         $total_items = $wpdb->get_var("SELECT COUNT(id) FROM $simple_cro_table");
 
-        // Handle search query   
         $search_query = isset($_REQUEST['s']) ? sanitize_text_field($_REQUEST['s']) : '';
   
-
-        // prepare query params, as usual current page, order by and order direction
         $paged = isset($_REQUEST['paged']) ? max(0, intval($_REQUEST['paged'] - 1) * $per_page) : 0;
         $orderby = (isset($_REQUEST['orderby']) && in_array($_REQUEST['orderby'], array_keys($this->get_sortable_columns()))) ? $_REQUEST['orderby'] : 'created_at';
         $order = (isset($_REQUEST['order']) && in_array($_REQUEST['order'], array('asc', 'desc'))) ? $_REQUEST['order'] : 'desc';
-        $query = "SELECT sct.id, sct.title, sct.cat, sct.tag, sct.created_at, SUM(CASE WHEN scc.block_variation = 'a' THEN 1 ELSE 0 END) AS count_a,SUM(CASE WHEN scc.block_variation = 'b' THEN 1 ELSE 0 END) AS count_b,CASE WHEN SUM(CASE WHEN scc.block_variation = 'a' THEN 1 ELSE 0 END) > SUM(CASE WHEN scc.block_variation = 'b' THEN 1 ELSE 0 END) THEN sct.block1_title ELSE sct.block2_title END AS winning_block_title FROM $simple_cro_table AS sct INNER JOIN $simple_cro_click_table AS scc ON sct.id = scc.cro_id ";
+        $query = "SELECT sct.id, sct.title, sct.cat, sct.tag, sct.created_at, 
+        SUM(CASE WHEN scc.block_variation = 'a' THEN 1 ELSE 0 END) AS count_a,
+        SUM(CASE WHEN scc.block_variation = 'b' THEN 1 ELSE 0 END) AS count_b,
+        CASE WHEN SUM(CASE WHEN scc.block_variation = 'a' THEN 1 ELSE 0 END) > SUM(CASE WHEN scc.block_variation = 'b' THEN 1 ELSE 0 END) THEN sct.block1_title ELSE sct.block2_title END AS winning_block_title FROM $simple_cro_table AS sct INNER JOIN $simple_cro_click_table AS scc ON sct.id = scc.cro_id ";
 
-        // Add search conditions to the query if a search query is provided
         if (!empty($search_query)) {
             $query .= $wpdb->prepare("WHERE (title LIKE '%%%s%%' OR cat LIKE '%%%s%%' OR tag LIKE '%%%s%%')", $search_query, $search_query, $search_query);
         }
-        // Append sorting and pagination clauses to the query
+
         $query .= " GROUP BY sct.id ORDER BY $orderby $order LIMIT $per_page OFFSET $paged";
 
-        // Execute the query
         $this->items = $wpdb->get_results($query, ARRAY_A);
        
-        //print_r($this->items);
-         // [REQUIRED] configure pagination
-         $this->set_pagination_args(array(
-            'total_items'   => $total_items, // total items defined above
-            'per_page'      => $per_page, // per page constant defined at top of method
-            'total_pages'   => ceil($total_items / $per_page) // calculate pages count
+        $this->set_pagination_args(array(
+            'total_items'   => $total_items,
+            'per_page'      => $per_page,
+            'total_pages'   => ceil($total_items / $per_page)
         ));        
     }
+    
+    // Function to display view form
     public function display_view_form() {
-        if (isset($_GET['id'])) {
+        if (isset($_GET['id']) && $_GET['id'] !== '') {
             $item_id = $_GET['id'];
-            
+
             global $wpdb;
             $simple_cro_table = $wpdb->prefix . SIMPLE_CRO_TABLE;
-            $simple_cro_click_table = $wpdb->prefix . SIMPLE_CRO_CLICK_TABLE;
             $query = $wpdb->prepare("SELECT * FROM $simple_cro_table WHERE id = %d", $item_id);
             $item_data = $wpdb->get_row($query, ARRAY_A);
-            ?>
-            <div class="wrap">
-                <h1 class="wp-heading-inline"><?php _e('Edit Simple CRO Test', $this->plugin_name)?></h1>
-                <form method="get" action="">
-                    <!-- Display item title with full width -->
-                    <input type="text" name="item_title" value="<?php echo esc_attr($item_data['title']); ?>" style="width: 100%; background-color: #fff; font-size: 22px;" readonly>
-                   
-                </form>
+            if ($item_data) {
+                $block_a = '';
+                $block_b = '';
                 
-                <!-- Tabs for Live Results and Settings -->
-                <div class="nav-tab-wrapper">
-                    <a href="#live-results" class="nav-tab"><?php _e('Live Results', $this->plugin_name)?></a>
-                    <a href="#settings" class="nav-tab"><?php _e('Settings', $this->plugin_name)?></a>
-                </div>
+                $args = array(
+                    'post_type' => SIMPLE_CRO_CPT, 
+                    'posts_per_page' => -1, 
+                );
+                $query = new WP_Query($args);
+                if ($query->have_posts()) {
+                    while ($query->have_posts()) {
+                        $query->the_post();
+                        $post_content = get_the_content();
+                        if (strpos($post_content, $item_data['scro_id']) !== false) {
+                            $dom = new DOMDocument();
+                            @$dom->loadHTML($post_content); 
+                            $xpath = new DOMXPath($dom);
+                            $inner_blocks = $xpath->query('//div[contains(@class, "scro-inner-blocks")]');
     
-                <!-- Tab content with white background -->
-                <div id="live-results" class="tab-content" style="background-color: #fff;">
-                    <!-- Live Results content goes here -->
-                </div>
+                            if ($inner_blocks->length > 0) {
+                                $inner_block = $inner_blocks->item(0);
+                                $child_nodes = $inner_block->childNodes;
+                                
+                                foreach ($child_nodes as $node) {
+                                    if ($node->nodeType === XML_ELEMENT_NODE) {
+                                        $html_content = $dom->saveHTML($node);
+                                        if (empty($block_a)) {
+                                            $block_a = $html_content;
+                                        } else {
+                                            $block_b = $html_content;
+                                        }
+                                    }
+                                }
+                            } else {
+                                echo 'Inner blocks not found.';
+                            }
+                            break; 
+                        }
+                    }
+                    wp_reset_postdata();
+                }
+                ?>
+                <div class="wrap">
+                    <h1 class="wp-heading-inline"><?php _e('Edit Simple CRO Test', $this->plugin_name)?></h1>
+                    <form method="get" action="">
+                        <input type="text" name="item_title" value="<?php echo esc_attr($item_data['title']); ?>" style="width: 100%; background-color: #fff; font-size: 22px;">
+                    </form>
+                    
+                    <div class="nav-tab-wrapper">
+                        <a href="#live-results" class="nav-tab <?php if (!isset($_GET['tab']) || $_GET['tab'] === 'live-results') echo 'nav-tab-active'; ?>"><?php _e('Live Results', $this->plugin_name)?></a>
+                        <a href="#settings" class="nav-tab <?php if (isset($_GET['tab']) && $_GET['tab'] === 'settings') echo 'nav-tab-active'; ?>"><?php _e('Settings', $this->plugin_name)?></a>
+                    </div>
     
-                <div id="settings" class="tab-content" style="background-color: #fff;">
-                    <label for="cro_test_id"><?php _e('CRO Test ID:', $this->plugin_name) ?></label>
-                    <input type="text" id="cro_test_id" value="<?php echo $item_data['id']; ?>" readonly>
+                    <div id="live-results" class="tab-content <?php if (!isset($_GET['tab']) || $_GET['tab'] === 'live-results') echo 'active'; ?>" style="background-color: #fff;">
+                        <div class="live-result">
+                            <table class="live-results-table">
+                                <thead>
+                                    <tr>
+                                        <th>Block</th>
+                                        <th>Block Title</th>
+                                        <th>Block ID</th>
+                                        <th>Displays</th>
+                                        <th>Clicks</th>
+                                        <th>Conversion Rate</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <?php
+                                    // Display data rows
+                                    if ($item_data) {
+                                        echo '<tr>';
+                                        echo '<td>' . $item_data['block1_id'] . '</td>';
+                                        echo '<td>' . $item_data['block1_title'] . '</td>';
+                                        echo '<td>' . $item_data['block1_id'] . '</td>';
 
-                    <label for="cro_categories"><?php _e('CRO Categories:', $this->plugin_name) ?></label>
-                    <input type="text" id="cro_categories" value="<?php echo $item_data['cat']; ?>" readonly>
+                                        // Add more rows as needed
 
-                    <label for="cro_tags"><?php _e('CRO Tags:', $this->plugin_name) ?></label>
-                    <input type="text" id="cro_tags" value="<?php echo $item_data['tag']; ?>" readonly>
-
-                    <label for="block_a_title"><?php _e('Block A Title:', $this->plugin_name) ?></label>
-                    <input type="text" id="block_a_title" value="<?php echo $item_data['block1_title']; ?>" readonly>
-
-                    <label for="block_a_id"><?php _e('Block A ID:', $this->plugin_name) ?></label>
-                    <input type="text" id="block_a_id" value="<?php echo $item_data['block1_id']; ?>" readonly>
-
-                    <label for="block_b_title"><?php _e('Block B Title:', $this->plugin_name) ?></label>
-                    <input type="text" id="block_b_title" value="<?php echo $item_data['block2_title']; ?>" readonly>
-
-                    <label for="block_b_id"><?php _e('Block B ID:', $this->plugin_name) ?></label>
-                    <input type="text" id="block_b_id" value="<?php echo $item_data['block2_id']; ?>" readonly>
+                                        echo '</tr>';
+                                    } else {
+                                        echo '<tr><td colspan="6">No data found.</td></tr>';
+                                    }
+                                    ?>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+    
+                    <div id="settings" class="tab-content <?php if (isset($_GET['tab']) && $_GET['tab'] === 'settings') echo 'active'; ?>">
+                        <div class="setting-tab">
+                            <div class="row">
+                                <div class="flex-container">
+                                    <label for="cro_test_id"><?php _e('CRO Test ID:', $this->plugin_name) ?></label>
+                                    <input type="text" id="cro_test_id" value="<?php echo $item_data['scro_id']; ?>">
+                                </div>
+    
+                                <div class="flex-container">
+                                    <label for="cro_categories"><?php _e('CRO Categories:', $this->plugin_name) ?></label>
+                                    <input type="text" id="cro_categories" value="<?php echo $item_data['cat']; ?>">
+                                </div>
+    
+                                <div class="flex-container">
+                                    <label for="cro_tags"><?php _e('CRO Tags:', $this->plugin_name) ?></label>
+                                    <input type="text" id="cro_tags" value="<?php echo $item_data['tag']; ?>">
+                                </div>
+    
+                                <div class="flex-container">
+                                    <label for="cro_tags"><?php _e('Cro Block Distribution:', $this->plugin_name) ?></label>
+                                    <div>
+                                        <label for="block_a_percentage"><?php _e('Block A:', $this->plugin_name) ?></label>
+                                        <input type="text" id="block_a_percentage" value="<?php echo $item_data['block1_perc']; ?>">
+                                        <input type="range" id="block_percentage" min="<?php echo $item_data['block1_perc']; ?>" max="<?php echo $item_data['block2_perc']; ?>" value="<?php echo $item_data['block1_perc']; ?>">
+                                        <label for="block_b_percentage"><?php _e('Block B:', $this->plugin_name) ?></label>
+                                        <input type="text" id="block_b_percentage" value="<?php echo $item_data['block2_perc']; ?>">
+                                    </div>
+                                </div>
+                            </div>
+    
+                            <div class="row">
+                                <div class="flex-container">
+                                    <div class="flex-content">
+                                        <div class="flex">
+                                            <label><?php _e('Block A', $this->plugin_name) ?></label>
+                                            <div class="label">
+                                                <label for="block_a_title"><?php _e('Block Title:', $this->plugin_name) ?></label>
+                                                <input type="text" id="block_a_title" value="<?php echo $item_data['block1_title']; ?>">
+                                            </div>
+                                            <div  class="label">
+                                                <label for="block_a_id"><?php _e('Block ID:', $this->plugin_name) ?></label>
+                                                <input type="text" id="block_a_id" value="<?php echo $item_data['block1_id']; ?>">
+                                            </div>
+                                        </div>
+                                        <div class="card-container">
+                                            <div class="card">
+                                                <div><?php echo $block_a ?></div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+    
+                            <div class="row">
+                                <div class="flex-container">
+                                    <div class="flex-content">
+                                        <div class="flex">
+                                            <label><?php _e('Block B', $this->plugin_name) ?></label>
+                                            <div class="label">
+                                                <label><?php _e('Block Title:', $this->plugin_name) ?></label>
+                                                <input type="text" id="block_b_title" value="<?php echo $item_data['block2_title']; ?>">
+                                            </div>
+                                            <div  class="label">
+                                                <label><?php _e('Block ID:', $this->plugin_name) ?></label>
+                                                <input type="text" id="block_b_id" value="<?php echo $item_data['block2_id']; ?>">
+                                            </div>
+                                        </div>
+                                        <div class="card-container">
+                                            <div class="card">
+                                                <div><?php echo $block_b ?></div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
                 <style>
-                label {
-                    display: block; 
-                    margin-bottom: 5px; 
-                    font-weight: bold; 
-                }
-                input[type="text"] {
-                    width: 50%; 
-                    padding: 5px; 
-                    margin-bottom: 10px; 
-                    border: 1px solid #ccc; 
-                    border-radius: 4px; 
-                    box-sizing: border-box; 
-                }
-                .tab-content {
-                    padding: 20px; 
-                }
+                    .label {
+                        display: grid;
+                    }
+
+                    .flex-content {
+                        display: flex;
+                        justify-content: space-between;
+                    }
+
+                    .tab-content {
+                        background-color: #fff;
+                    }
+
+                    .setting-tab {
+                        padding: 1em;
+                    }
+
+                    .card-container {
+                        width: 50%;
+                    }
+
+                    .card {
+                        background-color: #f9f9f9;
+                        border: 1px solid #ddd;
+                        border-radius: 4px;
+                        padding: 20px;
+                        margin-bottom: 20px;
+                    }
+
+                    .row {
+                        display: flex;
+                        justify-content: space-between;
+                        align-items: center;
+                        margin-bottom: 20px;
+                    }
+
+                    .flex-container {
+                        display: flex;
+                        flex-direction: column;
+                        margin-right: 20px;
+                    }
+
+                    label {
+                        margin-bottom: 5px;
+                    }
+
+                    input[type="text"] {
+                        width: 150px;
+                        padding: 3px;
+                        margin-bottom: 10px;
+                    }
+
                 </style>
-            </div> 
+                <script>
+                    jQuery(document).ready(function() {
+                        jQuery('.nav-tab').click(function(event) {
+                            event.preventDefault();
+                            var tabId = jQuery(this).attr('href'); // Get the href attribute value (e.g., #live-results or #settings)
+                            jQuery('.nav-tab').removeClass('nav-tab-active');
+                            jQuery(this).addClass('nav-tab-active');
+                            jQuery('.tab-content').removeClass('active');
+                            jQuery(tabId).addClass('active');
+                        });
+                    });
+                </script>
+
                 <?php
-        } else {
-            echo '<p>' . __('Invalid item ID.', $this->plugin_name) . '</p>';
-        }          
-    }   
+            } else {
+                echo '<p>' . __('Invalid item ID.', $this->plugin_name) . '</p>';
+            }
+        }
+    }    
 }
+

@@ -116,23 +116,26 @@ class Wp_Simple_CRO_CPT {
     function display_simple_cro_list_page() {
         global $wpdb;
         $listTable = new Wp_Simple_CRO_Admin_List($this->plugin_name);
-        $listTable->prepare_items();
+        $listTable->prepare_items();      
     
-        $message = '';
-        if ('delete' === $listTable->current_action()) {
-            $message = '<div class="updated below-h2" id="message"><p>' . sprintf(__('Items deleted: %d', $this->plugin_name), count($_REQUEST['id'])) . '</p></div>';
-        }
-    
-        if (isset($_GET['id'])) {                
-            // If 'id' parameter is set, display the view form
+        if ('view' === $listTable->current_action() && isset($_GET['id']) && $_GET['id'] !== '') {                
             $listTable->display_view_form();                
         } else {
-            // If 'id' parameter is not set, display the CRO test table
+            if ('delete' === $listTable->current_action() && isset($_REQUEST['id']) && is_array($_REQUEST['id'])) {
+            // Check if items were deleted and show the deletion message
+            $deleted_items_count = isset($_REQUEST['id']) ? count($_REQUEST['id']) : 0;
+            $delete_message = $deleted_items_count > 0 ? sprintf(__('Items deleted: %d', $this->plugin_name), $deleted_items_count) : '';
+            var_dump( $delete_message);
+        }
             ?>
             <div class="wrap">
-                <div class="icon32 icon32-posts-post" id="icon-edit"><br></div> 
                 <h1 class="wp-heading-inline"><?php _e('CRO Block List', $this->plugin_name)?></h1>
-                <?php echo $message; ?>
+                <hr class="wp-header-end">
+                <?php
+                    if (!empty($delete_message)) {
+                        echo '<div class="notice is-dismissible updated" id="message"><p>' . $delete_message . '</p></div>';
+                    }                    
+                ?>
                 <form method="get" action="">
                     <input type="hidden" name="post_type" value="simple_cro">
                     <input type="hidden" name="page" value="simple-cro-list">

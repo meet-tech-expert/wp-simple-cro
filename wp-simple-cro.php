@@ -67,6 +67,19 @@ register_deactivation_hook( __FILE__, 'deactivate_wp_simple_cro' );
  * admin-specific hooks, and public-facing site hooks.
  */
 require plugin_dir_path( __FILE__ ) . 'includes/class-wp-simple-cro.php';
+function wp_cro_settings_link($wp_cro_links) {
+  
+    if ( is_plugin_active( plugin_basename( __FILE__ ) ) ) {
+        
+        $wp_cro_setting = '<a href="' . esc_url( admin_url( 'edit.php?post_type=simple_cro' ) ) . '">' . esc_html__( 'Settings', 'wp-simple-cro' ) . '</a>';
+
+        array_unshift( $wp_cro_links, $wp_cro_setting );
+    }
+
+    return $wp_cro_links;
+}
+
+add_filter('plugin_action_links_' . plugin_basename(__FILE__), 'wp_cro_settings_link');
 
 /**
  * Begins execution of the plugin.

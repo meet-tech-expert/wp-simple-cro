@@ -96,20 +96,9 @@
                          // Logic to randomly remove one of the blocks
                         var scroBlock1Perc = parseInt(scroBlocks.attr('data-scro-block1-perc'));
                         var scroBlock2Perc = parseInt(scroBlocks.attr('data-scro-block2-perc'));
-                        
-                        // var randNum = Math.floor(Math.random() * 100) + 1;
 
-                        // if (randNum <= scroBlock1Perc) {
-                        //     scroBlocks.find('[data-scro-block2-id]').remove();                        
-                        //     scroBlocks.find('[data-scro-block1-id]').attr('data-scro-active-block', true);
-                        // } else {
-                        //     scroBlocks.find('[data-scro-block1-id]').remove();
-                        //     scroBlocks.find('[data-scro-block2-id]').attr('data-scro-active-block', true);
-                        // }
-                       // Logic to randomly remove one of the blocks
-
-                        const percentageA = scroBlock1Perc; // Percentage for Block A
-                        const percentageB = scroBlock2Perc; // Percentage for Block B
+                        const percentageA = scroBlock1Perc;
+                        const percentageB = scroBlock2Perc;
 
                         // Total number of times to display blocks
                         const totalDisplays = 10;
