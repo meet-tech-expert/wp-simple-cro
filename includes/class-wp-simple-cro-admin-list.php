@@ -146,11 +146,14 @@ class Wp_Simple_CRO_Admin_List extends WP_List_Table {
     public function display_view_form() {
         if (isset($_GET['id']) && $_GET['id'] !== '') {
             $item_id = $_GET['id'];
-
+    
             global $wpdb;
             $simple_cro_table = $wpdb->prefix . SIMPLE_CRO_TABLE;
             $query = $wpdb->prepare("SELECT * FROM $simple_cro_table WHERE id = %d", $item_id);
             $item_data = $wpdb->get_row($query, ARRAY_A);
+            wp_enqueue_style('simple-cro-admin-list', plugin_dir_url(__FILE__) . '../admin/css/wp-simple-cro-admin-list.css');
+            wp_enqueue_script('simple-cro-admin-list', plugin_dir_url(__FILE__) . '../admin/js/wp-simple-cro-admin-list.js');
+
             if ($item_data) {
                 $block_a = '';
                 $block_b = '';
@@ -192,202 +195,27 @@ class Wp_Simple_CRO_Admin_List extends WP_List_Table {
                     }
                     wp_reset_postdata();
                 }
-                ?>
-                <div class="wrap">
-                    <h1 class="wp-heading-inline"><?php _e('Edit Simple CRO Test', $this->plugin_name)?></h1>
-                    <form method="get" action="">
-                        <input type="text" name="item_title" value="<?php echo esc_attr($item_data['title']); ?>" style="width: 100%; background-color: #fff; font-size: 22px;">
-                    </form>
-                    
-                    <div class="nav-tab-wrapper">
-                        <a href="#live-results" class="nav-tab <?php if (!isset($_GET['tab']) || $_GET['tab'] === 'live-results') echo 'nav-tab-active'; ?>"><?php _e('Live Results', $this->plugin_name)?></a>
-                        <a href="#settings" class="nav-tab <?php if (isset($_GET['tab']) && $_GET['tab'] === 'settings') echo 'nav-tab-active'; ?>"><?php _e('Settings', $this->plugin_name)?></a>
-                    </div>
-    
-                    <div id="live-results" class="tab-content <?php if (!isset($_GET['tab']) || $_GET['tab'] === 'live-results') echo 'active'; ?>" style="background-color: #fff;">
-                        <div class="live-result">
-                            <table class="live-results-table">
-                                <thead>
-                                    <tr>
-                                        <th>Block</th>
-                                        <th>Block Title</th>
-                                        <th>Block ID</th>
-                                        <th>Displays</th>
-                                        <th>Clicks</th>
-                                        <th>Conversion Rate</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <?php
-                                    // Display data rows
-                                    if ($item_data) {
-                                        echo '<tr>';
-                                        echo '<td>' . $item_data['block1_id'] . '</td>';
-                                        echo '<td>' . $item_data['block1_title'] . '</td>';
-                                        echo '<td>' . $item_data['block1_id'] . '</td>';
-
-                                        // Add more rows as needed
-
-                                        echo '</tr>';
-                                    } else {
-                                        echo '<tr><td colspan="6">No data found.</td></tr>';
-                                    }
-                                    ?>
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-    
-                    <div id="settings" class="tab-content <?php if (isset($_GET['tab']) && $_GET['tab'] === 'settings') echo 'active'; ?>">
-                        <div class="setting-tab">
-                            <div class="row">
-                                <div class="flex-container">
-                                    <label for="cro_test_id"><?php _e('CRO Test ID:', $this->plugin_name) ?></label>
-                                    <input type="text" id="cro_test_id" value="<?php echo $item_data['scro_id']; ?>">
-                                </div>
-    
-                                <div class="flex-container">
-                                    <label for="cro_categories"><?php _e('CRO Categories:', $this->plugin_name) ?></label>
-                                    <input type="text" id="cro_categories" value="<?php echo $item_data['cat']; ?>">
-                                </div>
-    
-                                <div class="flex-container">
-                                    <label for="cro_tags"><?php _e('CRO Tags:', $this->plugin_name) ?></label>
-                                    <input type="text" id="cro_tags" value="<?php echo $item_data['tag']; ?>">
-                                </div>
-    
-                                <div class="flex-container">
-                                    <label for="cro_tags"><?php _e('Cro Block Distribution:', $this->plugin_name) ?></label>
-                                    <div>
-                                        <label for="block_a_percentage"><?php _e('Block A:', $this->plugin_name) ?></label>
-                                        <input type="text" id="block_a_percentage" value="<?php echo $item_data['block1_perc']; ?>">
-                                        <input type="range" id="block_percentage" min="<?php echo $item_data['block1_perc']; ?>" max="<?php echo $item_data['block2_perc']; ?>" value="<?php echo $item_data['block1_perc']; ?>">
-                                        <label for="block_b_percentage"><?php _e('Block B:', $this->plugin_name) ?></label>
-                                        <input type="text" id="block_b_percentage" value="<?php echo $item_data['block2_perc']; ?>">
-                                    </div>
-                                </div>
-                            </div>
-    
-                            <div class="row">
-                                <div class="flex-container">
-                                    <div class="flex-content">
-                                        <div class="flex">
-                                            <label><?php _e('Block A', $this->plugin_name) ?></label>
-                                            <div class="label">
-                                                <label for="block_a_title"><?php _e('Block Title:', $this->plugin_name) ?></label>
-                                                <input type="text" id="block_a_title" value="<?php echo $item_data['block1_title']; ?>">
-                                            </div>
-                                            <div  class="label">
-                                                <label for="block_a_id"><?php _e('Block ID:', $this->plugin_name) ?></label>
-                                                <input type="text" id="block_a_id" value="<?php echo $item_data['block1_id']; ?>">
-                                            </div>
-                                        </div>
-                                        <div class="card-container">
-                                            <div class="card">
-                                                <div><?php echo $block_a ?></div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-    
-                            <div class="row">
-                                <div class="flex-container">
-                                    <div class="flex-content">
-                                        <div class="flex">
-                                            <label><?php _e('Block B', $this->plugin_name) ?></label>
-                                            <div class="label">
-                                                <label><?php _e('Block Title:', $this->plugin_name) ?></label>
-                                                <input type="text" id="block_b_title" value="<?php echo $item_data['block2_title']; ?>">
-                                            </div>
-                                            <div  class="label">
-                                                <label><?php _e('Block ID:', $this->plugin_name) ?></label>
-                                                <input type="text" id="block_b_id" value="<?php echo $item_data['block2_id']; ?>">
-                                            </div>
-                                        </div>
-                                        <div class="card-container">
-                                            <div class="card">
-                                                <div><?php echo $block_b ?></div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
+            ?>
+            <div class="wrap simple-cro-form">
+                <h1 class="wp-heading-inline"><?php _e('Edit Simple CRO Test', $this->plugin_name)?></h1>
+                <form method="get" action="">
+                    <input type="text" name="item_title" value="<?php echo esc_attr($item_data['title']); ?>">
+                </form>                
+                <div class="nav-tab-wrapper">
+                    <a href="#live-results" class="nav-tab active"><?php _e('Live Results', $this->plugin_name)?></a>
+                    <a href="#settings" class="nav-tab"><?php _e('Settings', $this->plugin_name)?></a>
                 </div>
-                <style>
-                    .label {
-                        display: grid;
-                    }
-
-                    .flex-content {
-                        display: flex;
-                        justify-content: space-between;
-                    }
-
-                    .tab-content {
-                        background-color: #fff;
-                    }
-
-                    .setting-tab {
-                        padding: 1em;
-                    }
-
-                    .card-container {
-                        width: 50%;
-                    }
-
-                    .card {
-                        background-color: #f9f9f9;
-                        border: 1px solid #ddd;
-                        border-radius: 4px;
-                        padding: 20px;
-                        margin-bottom: 20px;
-                    }
-
-                    .row {
-                        display: flex;
-                        justify-content: space-between;
-                        align-items: center;
-                        margin-bottom: 20px;
-                    }
-
-                    .flex-container {
-                        display: flex;
-                        flex-direction: column;
-                        margin-right: 20px;
-                    }
-
-                    label {
-                        margin-bottom: 5px;
-                    }
-
-                    input[type="text"] {
-                        width: 150px;
-                        padding: 3px;
-                        margin-bottom: 10px;
-                    }
-
-                </style>
-                <script>
-                    jQuery(document).ready(function() {
-                        jQuery('.nav-tab').click(function(event) {
-                            event.preventDefault();
-                            var tabId = jQuery(this).attr('href'); // Get the href attribute value (e.g., #live-results or #settings)
-                            jQuery('.nav-tab').removeClass('nav-tab-active');
-                            jQuery(this).addClass('nav-tab-active');
-                            jQuery('.tab-content').removeClass('active');
-                            jQuery(tabId).addClass('active');
-                        });
-                    });
-                </script>
-
-                <?php
-            } else {
-                echo '<p>' . __('Invalid item ID.', $this->plugin_name) . '</p>';
-            }
+                <div id="live-results" class="tab-content active">
+                    <?php require_once(plugin_dir_path(__FILE__) . '../admin/partials/simple-cro-cpt-view-live-result.php'); ?>
+                </div>
+                <div id="settings" class="tab-content">
+                    <?php require_once(plugin_dir_path(__FILE__) . '../admin/partials/simple-cro-cpt-view-setting.php'); ?>
+                </div>
+            </div>
+            <?php
+        } else {
+            echo '<p>' . __('Invalid item ID.', $this->plugin_name) . '</p>';
         }
-    }    
+        }
+    }
 }
-

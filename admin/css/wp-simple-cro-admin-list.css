@@ -1,0 +1,151 @@
+.simple-cro-form input[type="text"] {
+    width: 100%;
+    margin-bottom: 10px;
+}
+.setting-tab input[type="text"] {
+    width: 150px;
+}
+.cro-perc input[type="text"]{
+    width: 50px;
+    margin-top: 5px;
+}
+.cro-perc {
+    display: flex;
+    align-items: center;
+}
+.cro-perc-block{
+    margin-right: 20px;
+}
+.tab-content {
+    display: none;
+}
+.tab-content.active {
+    display: block;
+}
+.nav-tab.active {
+    background-color: #fff; 
+    color: #000;
+}
+.simple-cro-form .nav-tab-wrapper{
+    border: none !important;
+}
+.label {
+    display: grid;
+    margin-top: 5px;
+}
+
+.flex-content {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.tab-content {
+    background-color: #fff;
+}
+
+.simple-cro-tab  {
+    padding: 2em;
+}
+
+.card-container {
+    width: 50%;
+}
+
+.card {
+    background-color: #f9f9f9;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    padding: 20px;
+    margin-bottom: 20px;
+}
+
+.row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.flex-container {
+    display: flex;
+    flex-direction: column;
+    margin-right: 20px;
+}
+
+.simple-cro-form label {
+    margin-bottom: 5px;
+    font-weight: 700;
+}
+.live-results-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.live-results-table th,
+.live-results-table td {
+    border: 1px solid #ccc;
+    padding: 8px;
+    text-align: left;
+}
+
+.live-results-table th {
+    background-color: #f2f2f2;
+}
+
+.live-results-table tbody tr:nth-child(even) {
+    background-color: #f2f2f2;
+}
+
+.live-results-table tbody tr:hover {
+    background-color: #ddd;
+}
+.live-result {
+    display: grid;
+    justify-content: center;
+    margin-bottom: 30px;
+}
+/* Center the heading */
+.heading-center {
+    text-align: center;
+}
+
+/* Style for the circles */
+.circle-container {
+    text-align: center;
+    display: flex;
+}
+
+.circle {
+    width: 150px;
+    height: 150px;
+    border-radius: 50%;
+    margin: 10px;
+}
+
+.red {
+    background-color: red;
+}
+
+.blue {
+    background-color: blue;
+}
+
+/* Style for the buttons */
+.button-container {
+    text-align: center;
+    margin-top: 20px;
+}
+
+.button-container button {
+    padding: 10px 20px;
+    margin: 0 10px;
+    background-color: #ccc;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    margin-right: 20px;
+}
+
+.button:hover {
+    background-color: #aaa;
+}
