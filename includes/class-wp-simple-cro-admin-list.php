@@ -157,17 +157,10 @@ class Wp_Simple_CRO_Admin_List extends WP_List_Table {
             if ($item_data) {
                 $block_a = '';
                 $block_b = '';
-                
-                $args = array(
-                    'post_type' => SIMPLE_CRO_CPT, 
-                    'posts_per_page' => -1, 
-                );
-                $query = new WP_Query($args);
-                if ($query->have_posts()) {
-                    while ($query->have_posts()) {
-                        $query->the_post();
-                        $post_content = get_the_content();
-                        if (strpos($post_content, $item_data['scro_id']) !== false) {
+              //var_dump($item_data['scro_id']);
+                     $post_content = get_post_field('post_content', $item_data['post_id'],'display');
+                    //var_dump(strpos($post_content, $item_data['scro_id']));
+                       // if (strpos($post_content, $item_data['scro_id']) !== false) {
                             $dom = new DOMDocument();
                             @$dom->loadHTML($post_content); 
                             $xpath = new DOMXPath($dom);
@@ -187,14 +180,9 @@ class Wp_Simple_CRO_Admin_List extends WP_List_Table {
                                         }
                                     }
                                 }
-                            } else {
-                                echo 'Inner blocks not found.';
                             }
-                            break; 
-                        }
-                    }
-                    wp_reset_postdata();
-                }
+                      //  }
+                    
             ?>
             <div class="wrap simple-cro-form">
                 <h1 class="wp-heading-inline"><?php _e('Edit Simple CRO Test', $this->plugin_name)?></h1>

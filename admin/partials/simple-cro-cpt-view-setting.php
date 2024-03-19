@@ -37,7 +37,7 @@
         <div class="flex-container">
             <div class="flex-content">
                 <div class="flex">
-                    <label>Block A</label>
+                    <h3>Block A</h3>
                     <div class="label">
                         <label for="block_a_title" class="setting-label">Block Title <span class="required">*</span></label>
                         <input type="text" id="block_a_title" class="setting-input" value="<?php echo $item_data['block1_title']; ?>">
@@ -49,7 +49,7 @@
                 </div>
                 <div class="card-container">
                     <div class="card">
-                        <div><?php echo $block_a ?></div>
+                        <div><?php echo $block_a; ?></div>
                     </div>
                 </div>
             </div>
@@ -60,7 +60,7 @@
         <div class="flex-container">
             <div class="flex-content">
                 <div class="flex">
-                    <label>Block B</label>
+                    <h3>Block B</h3>
                     <div class="label">
                         <label class="setting-label">Block Title <span class="required">*</span></label>
                         <input type="text" id="block_b_title" class="setting-input" value="<?php echo $item_data['block2_title']; ?>">

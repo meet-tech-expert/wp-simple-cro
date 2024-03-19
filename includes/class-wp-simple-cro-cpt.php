@@ -125,7 +125,7 @@ class Wp_Simple_CRO_CPT {
             // Check if items were deleted and show the deletion message
             $deleted_items_count = isset($_REQUEST['id']) ? count($_REQUEST['id']) : 0;
             $delete_message = $deleted_items_count > 0 ? sprintf(__('Items deleted: %d', $this->plugin_name), $deleted_items_count) : '';
-            var_dump( $delete_message);
+            //var_dump( $delete_message);
         }
             ?>
             <div class="wrap">

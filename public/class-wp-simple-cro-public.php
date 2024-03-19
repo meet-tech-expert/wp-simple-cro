@@ -72,9 +72,11 @@ class Wp_Simple_Cro_Public {
 	 */
 	public function enqueue_scripts() {
 		wp_enqueue_script( 'simple-cro-gutenberg', plugin_dir_url( __FILE__ ) . 'js/simple-cro-front.js', array( 'jquery' ), $this->version, false );
+		global $post;
 		wp_localize_script( 'simple-cro-gutenberg', 'scroFrontBlock', array(
 			'ajax_url' => admin_url('admin-ajax.php'),
 			'nonce' => wp_create_nonce( 'handle_scro_data_nonce' ),
+			'post_id' => $post->ID,
 		));
 	}	
 	// store data in the database
@@ -137,7 +139,8 @@ class Wp_Simple_Cro_Public {
 					'block1_perc' => absint($_POST['scro_block1_percentage']),
 					'block2_id' => sanitize_text_field($_POST['scro_block2_id']),
 					'block2_title' => sanitize_text_field($_POST['scro_block2_title']),
-					'block2_perc' => absint($_POST['scro_block2_percentage'])
+					'block2_perc' => absint($_POST['scro_block2_percentage']),
+					'post_id' => sanitize_text_field($_POST['post_id']),
 				)
 			);
 			$lastid = $wpdb->insert_id;

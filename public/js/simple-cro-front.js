@@ -233,6 +233,7 @@
                                     scro_block2_id: scroBlock2Id,
                                     scro_block2_percentage: scroBlock2Perc,
                                     scro_block2_title: scroBlock2Title,
+                                    post_id : scroFrontBlock.post_id,
                                     scro_page_path: scroPagePath,
                                     scro_device_type: scroDeviceType,
                                     scro_block_variation : scroBlockVar,

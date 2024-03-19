@@ -42,6 +42,7 @@
 
 .tab-content {
     background-color: #fff;
+    margin-left: 0.5em;
 }
 
 .simple-cro-tab  {
@@ -105,10 +106,16 @@
     margin-bottom: 30px;
 }
 /* Center the heading */
-.heading-center {
+.live-result .top-cahrt{
+    margin-bottom: 2em;
     text-align: center;
 }
-
+.live-result .top-cahrt strong {
+    text-decoration: underline;
+    font-size: 1rem;
+    color: #006836;
+    font-weight: bold;
+}
 /* Style for the circles */
 .circle-container {
     text-align: center;

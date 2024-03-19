@@ -30,3 +30,59 @@
 	 */
 
 })( jQuery );
+
+const DATA_COUNT = 5;
+const NUMBER_CFG = {count: DATA_COUNT, min: 0, max: 100};
+
+const displayCtx = document.getElementById('displayChart');
+const dconversionCtx = document.getElementById('conversionChart');
+
+  new Chart(displayCtx, {
+    type: 'pie',
+    data: {
+      labels: ['Block A', 'Block B'],
+      datasets: [{
+        label: 'Displayed',
+        data: [12, 19],
+        borderWidth: 1
+      }]
+    },
+    options: {
+		responsive: true,
+		plugins: {
+		  legend: {
+			position: 'bottom',
+		  },
+		  title: {
+			display: true,
+			text: 'Displayed'
+		  }
+		}
+	},
+  });
+
+  new Chart(dconversionCtx, {
+    type: 'pie',
+    data: {
+      labels: ['Block A', 'Block B'],
+      datasets: [
+		{
+        label: 'Conversion',
+        data: [10, 25],
+        borderWidth: 1
+       }
+	]
+    },
+    options: {
+		responsive: true,
+		plugins: {
+		  legend: {
+			position: 'bottom',
+		  },
+		  title: {
+			display: true,
+			text: 'Conversion'
+		  }
+		}
+	},
+  });

@@ -46,6 +46,7 @@
             block2_id VARCHAR(50) NOT NULL COMMENT 'ID of Block 2 in SCRO',
             block2_title VARCHAR(255) NOT NULL COMMENT 'Title of Block 2 in SCRO',
             block2_perc INT NOT NULL COMMENT 'Percentage of Block 2 in SCRO',
+            post_id INT NOT NULL COMMENT 'ID of the post/page',
             created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP 
         ) $charset_collate;";
     
