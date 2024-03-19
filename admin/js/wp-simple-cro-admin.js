@@ -31,9 +31,6 @@
 
 })( jQuery );
 
-const DATA_COUNT = 5;
-const NUMBER_CFG = {count: DATA_COUNT, min: 0, max: 100};
-
 const displayCtx = document.getElementById('displayChart');
 const dconversionCtx = document.getElementById('conversionChart');
 
