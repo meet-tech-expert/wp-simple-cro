@@ -43,7 +43,7 @@ class Wp_Simple_CRO_Admin_List extends WP_List_Table {
     // Rendering column with title and actions
     public function column_title($item) {
         $actions = array(
-            'view'      => sprintf('<a href="?post_type=simple_cro&page=simple-cro-list&action=view&id=%s">%s</a>', $item['id'], __('View', $this->plugin_name)),
+            'view'      => sprintf('<a href="?post_type=simple_cro&page=simple-cro-list&action=view&id=%s&data-id=%s">%s</a>', $item['id'],$item['scro_id'], __('View', $this->plugin_name)),
             'delete'    => sprintf('<a href="?post_type=simple_cro&page=simple-cro-list&action=delete&id=%s">%s</a>', $item['id'], __('Delete', $this->plugin_name)),
         );
         return sprintf('%1$s %2$s', $item['title'], $this->row_actions($actions));
@@ -51,8 +51,8 @@ class Wp_Simple_CRO_Admin_List extends WP_List_Table {
 
     // Checkbox column
     public function column_cb($item) {
-        return sprintf('<input type="checkbox" name="id[]" value="%s" />', $item['id']);
-    }
+        return sprintf('<input type="checkbox" name="id[]" value="%s" data-id="%s" />', $item['id'], $item['scro_id']);
+    }  
 
     // Define columns for the table
     public function get_columns() {
@@ -122,7 +122,7 @@ class Wp_Simple_CRO_Admin_List extends WP_List_Table {
         $paged = isset($_REQUEST['paged']) ? max(0, intval($_REQUEST['paged'] - 1) * $per_page) : 0;
         $orderby = (isset($_REQUEST['orderby']) && in_array($_REQUEST['orderby'], array_keys($this->get_sortable_columns()))) ? $_REQUEST['orderby'] : 'created_at';
         $order = (isset($_REQUEST['order']) && in_array($_REQUEST['order'], array('asc', 'desc'))) ? $_REQUEST['order'] : 'desc';
-        $query = "SELECT sct.id, sct.title, sct.cat, sct.tag, sct.created_at, 
+        $query = "SELECT sct.id, sct.scro_id, sct.title, sct.cat, sct.tag, sct.created_at, 
         SUM(CASE WHEN scc.block_variation = 'a' THEN 1 ELSE 0 END) AS count_a,
         SUM(CASE WHEN scc.block_variation = 'b' THEN 1 ELSE 0 END) AS count_b,
         CASE WHEN SUM(CASE WHEN scc.block_variation = 'a' THEN 1 ELSE 0 END) > SUM(CASE WHEN scc.block_variation = 'b' THEN 1 ELSE 0 END) THEN sct.block1_title ELSE sct.block2_title END AS winning_block_title FROM $simple_cro_table AS sct INNER JOIN $simple_cro_click_table AS scc ON sct.id = scc.cro_id ";
@@ -141,69 +141,86 @@ class Wp_Simple_CRO_Admin_List extends WP_List_Table {
             'total_pages'   => ceil($total_items / $per_page)
         ));        
     }
-    
-    // Function to display view form
+    //view form
     public function display_view_form() {
-        if (isset($_GET['id']) && $_GET['id'] !== '') {
+        if (isset($_GET['id']) && $_GET['id'] !== '' && isset($_GET['data-id'])) {
             $item_id = $_GET['id'];
     
             global $wpdb;
             $simple_cro_table = $wpdb->prefix . SIMPLE_CRO_TABLE;
+            $simple_cro_click_table = $wpdb->prefix . SIMPLE_CRO_CLICK_TABLE;
+    
             $query = $wpdb->prepare("SELECT * FROM $simple_cro_table WHERE id = %d", $item_id);
             $item_data = $wpdb->get_row($query, ARRAY_A);
+    
             wp_enqueue_style('simple-cro-admin-list', plugin_dir_url(__FILE__) . '../admin/css/wp-simple-cro-admin-list.css');
             wp_enqueue_script('simple-cro-admin-list', plugin_dir_url(__FILE__) . '../admin/js/wp-simple-cro-admin-list.js');
-
             if ($item_data) {
-                $block_a = '';
-                $block_b = '';
-              //var_dump($item_data['scro_id']);
-                     $post_content = get_post_field('post_content', $item_data['post_id'],'display');
-                    //var_dump(strpos($post_content, $item_data['scro_id']));
-                       // if (strpos($post_content, $item_data['scro_id']) !== false) {
-                            $dom = new DOMDocument();
-                            @$dom->loadHTML($post_content); 
-                            $xpath = new DOMXPath($dom);
-                            $inner_blocks = $xpath->query('//div[contains(@class, "scro-inner-blocks")]');
+                $post_content = get_post_field('post_content', $item_data['post_id'], 'display');
+                // Load the HTML content into a DOMDocument
+                $dom = new DOMDocument();
+                $dom->loadHTML($post_content);
+                $xpath = new DOMXPath($dom);
     
-                            if ($inner_blocks->length > 0) {
-                                $inner_block = $inner_blocks->item(0);
-                                $child_nodes = $inner_block->childNodes;
-                                
-                                foreach ($child_nodes as $node) {
-                                    if ($node->nodeType === XML_ELEMENT_NODE) {
-                                        $html_content = $dom->saveHTML($node);
-                                        if (empty($block_a)) {
-                                            $block_a = $html_content;
-                                        } else {
-                                            $block_b = $html_content;
-                                        }
-                                    }
+                // Find all div elements with class "scro-wrapper"
+                $scro_wrappers = $xpath->query('//div[contains(@class, "scro-wrapper")]');
+    
+                // Initialize blocks array
+                $blocks = array('block_a' => '', 'block_b' => '');
+    
+                // Loop through each div element
+                foreach ($scro_wrappers as $scro_wrapper) {
+                    // Get the data-scro-id attribute value of the wrapper
+                    $scro_id = $scro_wrapper->getAttribute('data-scro-id');
+                    $data_id = isset($_GET['data-id']) ? $_GET['data-id'] : '';
+                    $blocks = array();
+    
+                    if ($scro_id == $data_id) {
+                        // Find the inner blocks within the current scro_wrapper
+                        $inner_blocks = $xpath->query('.//div[contains(@class, "scro-inner-blocks")]/child::*', $scro_wrapper);
+    
+                        // Check if inner blocks are found
+                        if ($inner_blocks->length > 0) {
+                            // Loop through each inner block
+                            foreach ($inner_blocks as $inner_block) {
+                                // Get the HTML content of the inner block
+                                $html_content = $dom->saveHTML($inner_block);
+                                // Store the HTML content in block_a or block_b based on emptiness
+                                if (empty($blocks['block_a'])) {
+                                    $blocks['block_a'] = $html_content;
+                                } else {
+                                    $blocks['block_b'] = $html_content;
                                 }
                             }
-                      //  }
-                    
-            ?>
-            <div class="wrap simple-cro-form">
-                <h1 class="wp-heading-inline"><?php _e('Edit Simple CRO Test', $this->plugin_name)?></h1>
-                <form method="get" action="">
-                    <input type="text" name="item_title" value="<?php echo esc_attr($item_data['title']); ?>">
-                </form>                
-                <div class="nav-tab-wrapper">
-                    <a href="#live-results" class="nav-tab active"><?php _e('Live Results', $this->plugin_name)?></a>
-                    <a href="#settings" class="nav-tab"><?php _e('Settings', $this->plugin_name)?></a>
+                        } else {
+                            echo 'Inner blocks not found.';
+                        }
+                        // Break the loop since we found the matching wrapper
+                        break;
+                    }
+                }
+    
+                ?>
+                <div class="wrap simple-cro-form">
+                    <h1 class="wp-heading-inline"><?php _e('Edit Simple CRO Test', $this->plugin_name)?></h1>
+                    <form method="get" action="">
+                        <input type="text" name="item_title" data-id="<?php echo esc_attr($item_data['scro_id']) ?>" value="<?php echo esc_attr($item_data['title']); ?>">
+                    </form>
+                    <div class="nav-tab-wrapper">
+                        <a href="#live-results" class="nav-tab active"><?php _e('Live Results', $this->plugin_name)?></a>
+                        <a href="#settings" class="nav-tab"><?php _e('Settings', $this->plugin_name)?></a>
+                    </div>
+                    <div id="live-results" class="tab-content active">
+                        <?php require_once(plugin_dir_path(__FILE__) . '../admin/partials/simple-cro-cpt-view-live-result.php'); ?>
+                    </div>
+                    <div id="settings" class="tab-content">
+                        <?php require_once(plugin_dir_path(__FILE__) . '../admin/partials/simple-cro-cpt-view-setting.php'); ?>
+                    </div>
                 </div>
-                <div id="live-results" class="tab-content active">
-                    <?php require_once(plugin_dir_path(__FILE__) . '../admin/partials/simple-cro-cpt-view-live-result.php'); ?>
-                </div>
-                <div id="settings" class="tab-content">
-                    <?php require_once(plugin_dir_path(__FILE__) . '../admin/partials/simple-cro-cpt-view-setting.php'); ?>
-                </div>
-            </div>
-            <?php
-        } else {
-            echo '<p>' . __('Invalid item ID.', $this->plugin_name) . '</p>';
+                <?php
+            } else {
+                echo '<p>' . __('Invalid item ID.', $this->plugin_name) . '</p>';
+            }
         }
-        }
-    }
+    } 
 }

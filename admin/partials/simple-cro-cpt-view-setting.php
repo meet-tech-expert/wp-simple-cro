@@ -49,7 +49,7 @@
                 </div>
                 <div class="card-container">
                     <div class="card">
-                        <div><?php echo $block_a; ?></div>
+                        <div><?php echo $blocks['block_a']; ?></div>
                     </div>
                 </div>
             </div>
@@ -72,7 +72,7 @@
                 </div>
                 <div class="card-container">
                     <div class="card">
-                        <div><?php echo $block_b ?></div>
+                        <div><?php echo $blocks['block_b'] ?></div>
                     </div>
                 </div>
             </div>

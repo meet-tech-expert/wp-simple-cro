@@ -25,5 +25,15 @@
                 window.location.href = deleteUrl;
             }
         });
+        var rangeInput = $('#block_percentage');
+        var blockAPercentageInput = $('#block_a_percentage');
+        var blockBPercentageInput = $('#block_b_percentage');
+
+        // Add event listener to range input
+        rangeInput.on('input', function() {
+            // Update text inputs with range value
+            blockAPercentageInput.val($(this).val());
+            blockBPercentageInput.val(100 - $(this).val()); 
+        });
     });
 })(jQuery);
