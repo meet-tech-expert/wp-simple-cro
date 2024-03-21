@@ -196,19 +196,21 @@
                                 scroBlock.attr('data-scro-block-unique-id', blun[0]+'_b_'+blun[2] )
                             }
                         });
-                        scroWrap.find('.scro-inner-blocks').removeClass('invisible');                       
+                        scroWrap.find('.scro-inner-blocks').removeClass('invisible');      
+                        
+                        var scroID = scroWrap.attr('data-scro-id');
+                        var scroUnquieId = scroWrap.attr('data-scro-unique-id');
+                        var scroTitle = scroWrap.data('scro-title');
+                        var scroCat = scroWrap.data('scro-cat');
+                        var scroTag = scroWrap.data('scro-tag');
+                        var scroBlock1Title = scroBlock.data('scro-block1-title');
+                        var scroBlock2Title = scroBlock.data('scro-block2-title');     
+
+                        handleSCROBlockDisplay(scroID,scroUnquieId,scroTitle,scroCat,scroTag,scroBlock1Title,scroBlock2Title,scroBlockVar,scroBlock1Id,scroBlock2Id,scroBlock2Perc,scroBlock1Perc);                
                         scroBlock.on('click', 'a', function(event) {
                             event.preventDefault(); 
                             
-                            var scroBtnUrl = $(this).attr('href'); 
-                            
-                            var scroID = scroWrap.attr('data-scro-id');
-                            var scroUnquieId = scroWrap.attr('data-scro-unique-id');
-                            var scroTitle = scroWrap.data('scro-title');
-                            var scroCat = scroWrap.data('scro-cat');
-                            var scroTag = scroWrap.data('scro-tag');
-                            var scroBlock1Title = scroBlock.data('scro-block1-title');
-                            var scroBlock2Title = scroBlock.data('scro-block2-title');                            
+                            var scroBtnUrl = $(this).attr('href');                           
                             var scroColRowValue = $(this).attr('data-scro-block-cta-row-column');
                             var block_cta_order = $(this).attr('data-scro-block-cta-order');
                             var block_cta_unique_id = $(this).attr('data-scro-block-cta-unique-id');
@@ -259,13 +261,56 @@
                                     console.error('Error storing data:', error);
                                 }
                             });
-                        });
+                        });                        
                     });
                 }                
             }); 
             localStorage.setItem("scro_variations_index", JSON.stringify(_data));
         } 
     }
+    function handleSCROBlockDisplay(scroID,scroUnquieId,scroTitle,scroCat,scroTag,scroBlock1Title,scroBlock2Title,scroBlockVar,scroBlock1Id,scroBlock2Id,scroBlock2Perc,scroBlock1Perc){
+        // Initialize variables to track block display
+        let blockA =0;
+        let blockB =0;
+
+        if(scroBlockVar == 'a'){
+            blockA = 1;
+        }else{
+            blockB = 1;
+        }
+        // console.log(scroID,scroUnquieId,scroTitle,scroCat,scroTag,scroBlock1Title,scroBlock2Title,scroBlockVar);
+        $.ajax({
+            url: scroFrontBlock.ajax_url,
+            method: 'POST',
+            data: {
+                action: 'handle_scro_display',
+                block1_display: blockA,
+                block2_display: blockB,
+                scro_id: scroID,
+                scro_unique_id: scroUnquieId,
+                scro_title: scroTitle,
+                scro_cat: scroCat,
+                scro_tag: scroTag,
+                scro_block1_id: scroBlock1Id, 
+                scro_block1_percentage: scroBlock1Perc,
+                scro_block1_title: scroBlock1Title,
+                scro_block2_id: scroBlock2Id,
+                scro_block2_percentage: scroBlock2Perc,
+                scro_block2_title: scroBlock2Title,
+                post_id : scroFrontBlock.post_id,
+                scro_nonce: scroFrontBlock.nonce
+            },
+            success: function(response) {
+               
+                console.log('Blocks display recorded: Block A - ' + blockA + ', Block B - ' + blockB);
+            },
+            error: function(xhr, status, error) {
+                // Log error message to console
+                console.error('Error recording block display:', error);
+            }
+        });
+    }    
+    
     $(document).ready(function() {
         handleSimpleCRO();
     });

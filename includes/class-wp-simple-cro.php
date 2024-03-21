@@ -187,6 +187,8 @@ class Wp_Simple_Cro {
 		$this->loader->add_action( 'wp_enqueue_scripts', $plugin_public, 'enqueue_scripts' );
 		$this->loader->add_action( 'wp_ajax_handle_scro_click',$plugin_public, 'handle_scro_click' );
 		$this->loader->add_action( 'wp_ajax_nopriv_handle_scro_click',$plugin_public, 'handle_scro_click' );
+		$this->loader->add_action( 'wp_ajax_handle_scro_display',$plugin_public, 'handle_scro_display' );
+		$this->loader->add_action( 'wp_ajax_nopriv_handle_scro_display',$plugin_public, 'handle_scro_display' );
 	}
 
 	/**

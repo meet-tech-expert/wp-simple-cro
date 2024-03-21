@@ -166,4 +166,81 @@ class Wp_Simple_Cro_Public {
 			wp_send_json_error('Error inserting data into tables.');
 		}
 	}
+	public function handle_scro_display() {
+		global $wpdb;
+	
+		// Nonce verification
+		if (!isset($_POST['scro_nonce']) || !wp_verify_nonce($_POST['scro_nonce'], 'handle_scro_data_nonce')) {
+			wp_send_json_error('Nonce verification failed.');
+		}
+	
+		// Check if all required fields are set
+		$required_fields = array(
+			'scro_id', 'block1_display', 'block2_display'
+		);
+	
+		foreach ($required_fields as $field) {
+			if (!isset($_POST[$field])) {
+				wp_send_json_error('One or more required fields are missing.');
+			}
+		}
+	
+		// Retrieve scro_id from the POST data
+		$scro_id = sanitize_text_field($_POST['scro_id']);
+	
+		// Check if scro_id exists in the database
+		$simple_cro_table = $wpdb->prefix . SIMPLE_CRO_TABLE;
+		$existing_scro = $wpdb->get_row(
+			$wpdb->prepare(
+				"SELECT block1_display, block2_display FROM $simple_cro_table WHERE scro_id = %s",
+				$scro_id
+			)
+		);
+	
+		// Prepare data for insertion or update
+		$data = array(
+			'unique_id' => sanitize_text_field($_POST['scro_unique_id']),
+			'title' => sanitize_text_field($_POST['scro_title']),
+			'cat' => sanitize_text_field($_POST['scro_cat']),
+			'tag' => sanitize_text_field($_POST['scro_tag']),
+			'block1_id' => sanitize_text_field($_POST['scro_block1_id']),
+			'block1_title' => sanitize_text_field($_POST['scro_block1_title']),
+			'block1_perc' => absint($_POST['scro_block1_percentage']),
+			'block2_id' => sanitize_text_field($_POST['scro_block2_id']),
+			'block2_title' => sanitize_text_field($_POST['scro_block2_title']),
+			'block2_perc' => absint($_POST['scro_block2_percentage']),
+			'post_id' => sanitize_text_field($_POST['post_id']),
+		);
+	
+		if ($existing_scro) {
+			// Determine which block's display value to update based on the condition
+			if ($_POST['block1_display'] == 1) {
+				$data['block1_display'] = $existing_scro->block1_display + 1;
+				$data['block2_display'] = $existing_scro->block2_display;
+			} else {
+				$data['block1_display'] = $existing_scro->block1_display;
+				$data['block2_display'] = $existing_scro->block2_display + 1;
+			}
+	
+			// Update existing record
+			$updated = $wpdb->update($simple_cro_table, $data, array('scro_id' => $scro_id));
+			if ($updated !== false) {
+				wp_send_json_success('Data updated in simple_cro_table successfully.');
+			} else {
+				wp_send_json_error('Error updating data in simple_cro_table.');
+			}
+		} else {
+			// Insert new record
+			$data['block1_display'] = $_POST['block1_display'];
+			$data['block2_display'] = $_POST['block2_display'];
+			$inserted = $wpdb->insert($simple_cro_table, array_merge($data, array('scro_id' => $scro_id)));
+			if ($inserted !== false) {
+				wp_send_json_success('Data inserted into simple_cro_table successfully.');
+			} else {
+				wp_send_json_error('Error inserting data into simple_cro_table.');
+			}
+		}
+	}
+	
+	
 }
