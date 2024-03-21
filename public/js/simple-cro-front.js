@@ -145,8 +145,10 @@
                             if(variationsIndexes !== null) {
                                 let vData = variationsIndexes.find((item) => { return item.id === scroWrap.data('scro-id') })
                                 //console.log(vData)
-                            
-                             currentIndex = vData.index;
+                                if(vData){
+                                    currentIndex = vData.index;
+                                }
+                             
                             }  
                             // Check if currentIndex is within the range of 0 to 10
                             if (currentIndex >= 0 && currentIndex < 10) {
