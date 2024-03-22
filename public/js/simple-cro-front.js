@@ -1,6 +1,5 @@
 (function($) {
     function handleSimpleCRO() {
-
         var scroWraps = $('.scro-wrapper');
         var _data = [];
         if (scroWraps.length > 0) {
@@ -269,6 +268,9 @@
         } 
     }
     function handleSCROBlockDisplay(scroID,scroUnquieId,scroTitle,scroCat,scroTag,scroBlock1Title,scroBlock2Title,scroBlockVar,scroBlock1Id,scroBlock2Id,scroBlock2Perc,scroBlock1Perc){
+        if(scroID =='' && scroTitle =='' && scroBlock1Title =='' && scroBlock2Title =='' && scroBlock1Id == '' && scroBlock2Id == ''){
+            return false;
+        }
         // Initialize variables to track block display
         let blockA =0;
         let blockB =0;
@@ -278,7 +280,8 @@
         }else{
             blockB = 1;
         }
-        // console.log(scroID,scroUnquieId,scroTitle,scroCat,scroTag,scroBlock1Title,scroBlock2Title,scroBlockVar);
+        //console.log(scroID,scroUnquieId,scroTitle,scroCat,scroTag,scroBlock1Title,scroBlock2Title,scroBlockVar);
+
         $.ajax({
             url: scroFrontBlock.ajax_url,
             method: 'POST',

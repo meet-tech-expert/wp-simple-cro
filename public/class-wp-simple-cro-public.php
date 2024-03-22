@@ -231,8 +231,8 @@ class Wp_Simple_Cro_Public {
 			}
 		} else {
 			// Insert new record
-			$data['block1_display'] = $_POST['block1_display'];
-			$data['block2_display'] = $_POST['block2_display'];
+			$data['block1_display'] = sanitize_text_field($_POST['block1_display']);
+			$data['block2_display'] = sanitize_text_field($_POST['block2_display']);
 			$inserted = $wpdb->insert($simple_cro_table, array_merge($data, array('scro_id' => $scro_id)));
 			if ($inserted !== false) {
 				wp_send_json_success('Data inserted into simple_cro_table successfully.');

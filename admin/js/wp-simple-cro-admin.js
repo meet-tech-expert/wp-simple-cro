@@ -40,7 +40,7 @@ const dconversionCtx = document.getElementById('conversionChart');
       labels: ['Block A', 'Block B'],
       datasets: [{
         label: 'Displayed',
-        data: [12, 19],
+        data: [blocksData.blockA.display, blocksData.blockB.display],
         borderWidth: 1
       }]
     },
@@ -65,7 +65,7 @@ const dconversionCtx = document.getElementById('conversionChart');
       datasets: [
 		{
         label: 'Conversion',
-        data: [10, 25],
+        data: [blocksData.blockA.conversion, blocksData.blockB.conversion],
         borderWidth: 1
        }
 	]

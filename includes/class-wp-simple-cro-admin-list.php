@@ -144,19 +144,25 @@ class Wp_Simple_CRO_Admin_List extends WP_List_Table {
     //view form
     public function display_view_form() {
         if (isset($_GET['id']) && $_GET['id'] !== '' && isset($_GET['data-id'])) {
-            $item_id = $_GET['id'];
+            $cro_id = $_GET['id'];
     
             global $wpdb;
             $simple_cro_table = $wpdb->prefix . SIMPLE_CRO_TABLE;
             $simple_cro_click_table = $wpdb->prefix . SIMPLE_CRO_CLICK_TABLE;
     
-            $query = $wpdb->prepare("SELECT * FROM $simple_cro_table WHERE id = %d", $item_id);
-            $item_data = $wpdb->get_row($query, ARRAY_A);
+            $query = $wpdb->prepare("SELECT * FROM $simple_cro_table WHERE id = %d", $cro_id);
+            $cro_data = $wpdb->get_row($query, ARRAY_A);
     
             wp_enqueue_style('simple-cro-admin-list', plugin_dir_url(__FILE__) . '../admin/css/wp-simple-cro-admin-list.css');
             wp_enqueue_script('simple-cro-admin-list', plugin_dir_url(__FILE__) . '../admin/js/wp-simple-cro-admin-list.js');
-            if ($item_data) {
-                $post_content = get_post_field('post_content', $item_data['post_id'], 'display');
+            if ($cro_data) {
+                $croId = $cro_data['id'];
+                $blockAClicks = $wpdb->get_row("SELECT count(*) AS total FROM $simple_cro_click_table WHERE cro_id IN ($croId) AND block_variation = 'a'", ARRAY_A);
+                $blockBClicks = $wpdb->get_row("SELECT count(*) AS total FROM $simple_cro_click_table WHERE cro_id IN ($croId) AND block_variation = 'b'", ARRAY_A);
+               $blockAConversion = number_format(($blockAClicks['total']/$cro_data['block1_display'])*100,2);
+               $blockBConversion = number_format(($blockBClicks['total']/$cro_data['block2_display'])*100,2);
+               echo "<script>var blocksData= ".json_encode(array('blockA' => array('display'=> $cro_data['block1_display'], 'conversion' => $blockAConversion), 'blockB' => array('display'=> $cro_data['block2_display'], 'conversion' => $blockBConversion ) ))."</script>";
+                $post_content = get_post_field('post_content', $cro_data['post_id'], 'display');
                 // Load the HTML content into a DOMDocument
                 $dom = new DOMDocument();
                 $dom->loadHTML($post_content);
@@ -204,7 +210,7 @@ class Wp_Simple_CRO_Admin_List extends WP_List_Table {
                 <div class="wrap simple-cro-form">
                     <h1 class="wp-heading-inline"><?php _e('Edit Simple CRO Test', $this->plugin_name)?></h1>
                     <form method="get" action="">
-                        <input type="text" name="item_title" data-id="<?php echo esc_attr($item_data['scro_id']) ?>" value="<?php echo esc_attr($item_data['title']); ?>">
+                        <input type="text" name="item_title" data-id="<?php echo esc_attr($cro_data['scro_id']) ?>" value="<?php echo esc_attr($cro_data['title']); ?>">
                     </form>
                     <div class="nav-tab-wrapper">
                         <a href="#live-results" class="nav-tab active"><?php _e('Live Results', $this->plugin_name)?></a>
