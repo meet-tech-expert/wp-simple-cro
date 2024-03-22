@@ -35,5 +35,8 @@
             blockAPercentageInput.val($(this).val());
             blockBPercentageInput.val(100 - $(this).val()); 
         });
+        $('.expandable-row').click(function() {
+            $(this).next('.expanded-content').toggle();
+        });
     });
 })(jQuery);

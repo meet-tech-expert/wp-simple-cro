@@ -240,7 +240,5 @@ class Wp_Simple_Cro_Public {
 				wp_send_json_error('Error inserting data into simple_cro_table.');
 			}
 		}
-	}
-	
-	
+	}	
 }

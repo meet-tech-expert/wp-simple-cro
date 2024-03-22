@@ -159,8 +159,10 @@ class Wp_Simple_CRO_Admin_List extends WP_List_Table {
                 $croId = $cro_data['id'];
                 $blockAClicks = $wpdb->get_row("SELECT count(*) AS total FROM $simple_cro_click_table WHERE cro_id IN ($croId) AND block_variation = 'a'", ARRAY_A);
                 $blockBClicks = $wpdb->get_row("SELECT count(*) AS total FROM $simple_cro_click_table WHERE cro_id IN ($croId) AND block_variation = 'b'", ARRAY_A);
-               $blockAConversion = number_format(($blockAClicks['total']/$cro_data['block1_display'])*100,2);
-               $blockBConversion = number_format(($blockBClicks['total']/$cro_data['block2_display'])*100,2);
+                $blockAUniqueId = $wpdb->get_row("SELECT block_cta_unique_id FROM $simple_cro_click_table WHERE cro_id IN ($croId) AND block_variation = 'a'", ARRAY_A);
+                $blockBUniqueId =$wpdb->get_row("SELECT block_cta_unique_id FROM $simple_cro_click_table WHERE cro_id IN ($croId) AND block_variation = 'b'", ARRAY_A);
+                $blockAConversion = number_format(($blockAClicks['total']/$cro_data['block1_display'])*100,2);
+                $blockBConversion = number_format(($blockBClicks['total']/$cro_data['block2_display'])*100,2);
                echo "<script>var blocksData= ".json_encode(array('blockA' => array('display'=> $cro_data['block1_display'], 'conversion' => $blockAConversion), 'blockB' => array('display'=> $cro_data['block2_display'], 'conversion' => $blockBConversion ) ))."</script>";
                 $post_content = get_post_field('post_content', $cro_data['post_id'], 'display');
                 // Load the HTML content into a DOMDocument
@@ -196,6 +198,8 @@ class Wp_Simple_CRO_Admin_List extends WP_List_Table {
                                     $blocks['block_a'] = $html_content;
                                 } else {
                                     $blocks['block_b'] = $html_content;
+                                    // $blockb = htmlspecialchars($html_content);
+                                    // var_dump($blockb);
                                 }
                             }
                         } else {
@@ -205,7 +209,50 @@ class Wp_Simple_CRO_Admin_List extends WP_List_Table {
                         break;
                     }
                 }
-    
+                
+                $blockA_info = array('href' => '', 'text' => '');
+                $blockB_info = array('href' => '', 'text' => '');
+
+                // Function to extract attributes from an HTML element
+                function extractAttributes($html_content, &$info_array) {
+                    $dom = new DOMDocument();
+                    @$dom->loadHTML($html_content);
+
+                    // Get all elements
+                    $elements = $dom->getElementsByTagName('*');
+
+                    // Iterate through each element
+                    foreach ($elements as $element) {
+                        // Check if the element is an instance of DOMElement
+                        if ($element instanceof DOMElement) {
+                            // Check if the element is an anchor tag
+                            if ($element->tagName === 'a') {
+                                // Get href attribute
+                                $href = $element->getAttribute('href');
+                                // Update info array if href is not empty
+                                if (!empty($href)) {
+                                    $info_array['href'] = $href;
+                                }
+                            }
+                            // Get text content of the element
+                            $text = $element->nodeValue;
+                            // Update info array if text content is not empty
+                            if (!empty($text)) {
+                                $info_array['text'] = $text;
+                            }
+                            // If both href and text are found, break the loop
+                            if (!empty($info_array['href']) && !empty($info_array['text'])) {
+                                break;
+                            }
+                        }
+                    }
+                }
+
+                // Extract attributes for Block A
+                extractAttributes($blocks['block_a'], $blockA_info);
+                // Extract attributes for Block B
+                extractAttributes($blocks['block_b'], $blockB_info);
+
                 ?>
                 <div class="wrap simple-cro-form">
                     <h1 class="wp-heading-inline"><?php _e('Edit Simple CRO Test', $this->plugin_name)?></h1>
