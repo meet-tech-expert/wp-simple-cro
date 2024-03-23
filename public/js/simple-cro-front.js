@@ -209,6 +209,8 @@
                         scroBlock.on('click', 'a', function(event) {
                             event.preventDefault(); 
                             
+                            var scroBlockText = $(this).text();
+                            // console.log(scroBlockText);
                             var scroBtnUrl = $(this).attr('href');                           
                             var scroColRowValue = $(this).attr('data-scro-block-cta-row-column');
                             var block_cta_order = $(this).attr('data-scro-block-cta-order');
@@ -243,6 +245,8 @@
                                     block_cta_row_column : scroColRowValue,
                                     block_cta_order : block_cta_order,
                                     block_cta_unique_id : block_cta_unique_id,
+                                    block_url: scroBtnUrl,
+                                    block_text: scroBlockText,
                                     scro_nonce: scroFrontBlock.nonce
                                 },
                                 success: function(response) {

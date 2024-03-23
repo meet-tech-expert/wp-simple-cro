@@ -73,11 +73,13 @@ class Wp_Simple_Cro_Public {
 	public function enqueue_scripts() {
 		wp_enqueue_script( 'simple-cro-gutenberg', plugin_dir_url( __FILE__ ) . 'js/simple-cro-front.js', array( 'jquery' ), $this->version, false );
 		global $post;
-		wp_localize_script( 'simple-cro-gutenberg', 'scroFrontBlock', array(
-			'ajax_url' => admin_url('admin-ajax.php'),
-			'nonce' => wp_create_nonce( 'handle_scro_data_nonce' ),
-			'post_id' => $post->ID,
-		));
+		if ( $post && isset( $post->ID ) ) { 
+			wp_localize_script( 'simple-cro-gutenberg', 'scroFrontBlock', array(
+				'ajax_url' => admin_url('admin-ajax.php'),
+				'nonce' => wp_create_nonce( 'handle_scro_data_nonce' ),
+				'post_id' => $post->ID,
+			));
+		}
 	}	
 	// store data in the database
 	public function handle_scro_click() {
@@ -92,7 +94,7 @@ class Wp_Simple_Cro_Public {
 		$required_fields = array(
 			'scro_id', 'scro_unique_id', 'scro_cat', 'scro_title', 'scro_tag', 'scro_block1_id',
 			'scro_block1_percentage', 'scro_block1_title', 'scro_block2_id', 'scro_block2_percentage',
-			'scro_block2_title', 'scro_device_type', 'scro_page_path', 'scro_block_variation', 'block_cta_row_column'
+			'scro_block2_title', 'scro_device_type', 'scro_page_path', 'scro_block_variation', 'block_cta_row_column', 'block_url', 'block_text',
 		);
 	
 		foreach ($required_fields as $field) {
@@ -119,7 +121,10 @@ class Wp_Simple_Cro_Public {
 					'block_variation' => sanitize_text_field($_POST['scro_block_variation']),
 					'block_cta_row_column' => sanitize_text_field($_POST['block_cta_row_column']),
 					'block_cta_unique_id' => sanitize_text_field($_POST['block_cta_unique_id']),
-					'block_cta_order' => absint($_POST['block_cta_order'])
+					'block_cta_order' => absint($_POST['block_cta_order']),
+					'block_url' => sanitize_text_field($_POST['block_url']),
+					'block_text' => sanitize_text_field($_POST['block_text']),
+
 				)
 			);
 			if(!is_wp_error($inserted_into_simple_cro_click)){
@@ -153,7 +158,10 @@ class Wp_Simple_Cro_Public {
 					'block_variation' => sanitize_text_field($_POST['scro_block_variation']),
 					'block_cta_row_column' => sanitize_text_field($_POST['block_cta_row_column']),
 					'block_cta_unique_id' => sanitize_text_field($_POST['block_cta_unique_id']),
-					'block_cta_order' => absint($_POST['block_cta_order'])
+					'block_cta_order' => absint($_POST['block_cta_order']),
+					'block_url' => sanitize_text_field($_POST['block_url']),
+					'block_text' => sanitize_text_field($_POST['block_text']),
+
 				)
 			);
 			if(!is_wp_error($inserted_into_simple_cro)){

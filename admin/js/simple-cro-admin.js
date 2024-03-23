@@ -115,10 +115,10 @@
 
                             setAttributes({ croTitle: $(post.content.rendered).data('scro-title') });
                             setAttributes({ croCat: $(post.content.rendered).data('scro-cat') });
-                            setAttributes({ croTags: $(post.content.rendered).data('scro-tags') });
+                            setAttributes({ croTags: $(post.content.rendered).data('scro-tag') });
                             setAttributes({ croUniqueId: $(post.content.rendered).data('scro-id') }); 
-                            setAttributes({ croBlock1Slider: $postContent.find('.scro-inner-blocks').data('scro-block1-percentage') });
-                            setAttributes({ croBlock2Slider: $postContent.find('.scro-inner-blocks').data('scro-block2-percentage') });
+                            setAttributes({ croBlock1Slider: $postContent.find('.scro-inner-blocks').data('scro-block1-perc') });
+                            setAttributes({ croBlock2Slider: $postContent.find('.scro-inner-blocks').data('scro-block2-perc') });
                             setAttributes({ croBlock1Title: $postContent.find('.scro-inner-blocks').data('scro-block1-title') });
                             setAttributes({ croBlock2Title: $postContent.find('.scro-inner-blocks').data('scro-block2-title') });
                             setAttributes({ croBlock1UniqueId: $postContent.find('.scro-inner-blocks').data('scro-block1-id') });
