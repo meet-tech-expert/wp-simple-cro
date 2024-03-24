@@ -62,8 +62,8 @@
             block_cta_unique_id VARCHAR(50) NOT NULL COMMENT 'Unique ID of CTA in SCRO',
             device_type VARCHAR(255) NOT NULL COMMENT 'Type of device used for SCRO',
             page_path VARCHAR(255) NOT NULL COMMENT 'Page path for SCRO',
-            block_url VARCHAR(255) NOT NULL COMMENT 'URL of Blocks',
-            block_text VARCHAR(255) NOT NULL COMMENT 'Text of Blocks',
+            block_cta_url VARCHAR(255) NOT NULL COMMENT 'URL of Blocks',
+            block_cta_text VARCHAR(255) NOT NULL COMMENT 'Text of Blocks',
             add_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP
         ) $charset_collate;";
     

@@ -94,7 +94,7 @@ class Wp_Simple_Cro_Public {
 		$required_fields = array(
 			'scro_id', 'scro_unique_id', 'scro_cat', 'scro_title', 'scro_tag', 'scro_block1_id',
 			'scro_block1_percentage', 'scro_block1_title', 'scro_block2_id', 'scro_block2_percentage',
-			'scro_block2_title', 'scro_device_type', 'scro_page_path', 'scro_block_variation', 'block_cta_row_column', 'block_url', 'block_text',
+			'scro_block2_title', 'scro_device_type', 'scro_page_path', 'scro_block_variation', 'block_cta_row_column', 'block_cta_url', 'block_cta_text',
 		);
 	
 		foreach ($required_fields as $field) {
@@ -122,8 +122,8 @@ class Wp_Simple_Cro_Public {
 					'block_cta_row_column' => sanitize_text_field($_POST['block_cta_row_column']),
 					'block_cta_unique_id' => sanitize_text_field($_POST['block_cta_unique_id']),
 					'block_cta_order' => absint($_POST['block_cta_order']),
-					'block_url' => sanitize_text_field($_POST['block_url']),
-					'block_text' => sanitize_text_field($_POST['block_text']),
+					'block_cta_url' => sanitize_text_field($_POST['block_cta_url']),
+					'block_cta_text' => sanitize_text_field($_POST['block_cta_text']),
 
 				)
 			);
@@ -159,8 +159,8 @@ class Wp_Simple_Cro_Public {
 					'block_cta_row_column' => sanitize_text_field($_POST['block_cta_row_column']),
 					'block_cta_unique_id' => sanitize_text_field($_POST['block_cta_unique_id']),
 					'block_cta_order' => absint($_POST['block_cta_order']),
-					'block_url' => sanitize_text_field($_POST['block_url']),
-					'block_text' => sanitize_text_field($_POST['block_text']),
+					'block_cta_url' => sanitize_text_field($_POST['block_cta_url']),
+					'block_cta_text' => sanitize_text_field($_POST['block_cta_text']),
 
 				)
 			);

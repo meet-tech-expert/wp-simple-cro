@@ -245,8 +245,8 @@
                                     block_cta_row_column : scroColRowValue,
                                     block_cta_order : block_cta_order,
                                     block_cta_unique_id : block_cta_unique_id,
-                                    block_url: scroBtnUrl,
-                                    block_text: scroBlockText,
+                                    block_cta_url: scroBtnUrl,
+                                    block_cta_text: scroBlockText,
                                     scro_nonce: scroFrontBlock.nonce
                                 },
                                 success: function(response) {

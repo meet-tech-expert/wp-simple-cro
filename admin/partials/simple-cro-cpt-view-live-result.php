@@ -47,14 +47,14 @@
 
                     if (!empty($blockAUniqueId)) {
                         foreach ($blockAUniqueId as $uniqueId) {
-                            $blockAll = $wpdb->get_results("SELECT count(*) AS all_blocks, block_url, block_text FROM $simple_cro_click_table WHERE cro_id IN ($croId) AND block_variation = 'a' AND block_cta_unique_id = '{$uniqueId['block_cta_unique_id']}'", ARRAY_A);
+                            $blockAll = $wpdb->get_results("SELECT count(*) AS all_blocks, block_cta_url, block_cta_text FROM $simple_cro_click_table WHERE cro_id IN ($croId) AND block_variation = 'a' AND block_cta_unique_id = '{$uniqueId['block_cta_unique_id']}'", ARRAY_A);
                     
                             foreach ($blockAll as $blockA) {
                                 echo '<tr>';
                                 echo '<td>' . $blockA['all_blocks'] . '</td>'; 
                                 echo '<td>' . $uniqueId['block_cta_unique_id'] . '</td>'; 
-                                echo '<td>' . $blockA['block_url'] . '</td>'; 
-                                echo '<td>' . $blockA['block_text'] . '</td>'; 
+                                echo '<td>' . $blockA['block_cta_url'] . '</td>'; 
+                                echo '<td>' . $blockA['block_cta_text'] . '</td>'; 
                                 echo '</tr>';
                             }
                         }
@@ -93,14 +93,14 @@
 
                     if (!empty($blockBUniqueId)) {
                         foreach ($blockBUniqueId as $uniqueId) {
-                            $blockAll = $wpdb->get_results("SELECT count(*) AS all_blocks, block_url, block_text FROM $simple_cro_click_table WHERE cro_id IN ($croId) AND block_variation = 'b' AND block_cta_unique_id = '{$uniqueId['block_cta_unique_id']}'", ARRAY_A);
+                            $blockAll = $wpdb->get_results("SELECT count(*) AS all_blocks, block_cta_url, block_cta_text FROM $simple_cro_click_table WHERE cro_id IN ($croId) AND block_variation = 'b' AND block_cta_unique_id = '{$uniqueId['block_cta_unique_id']}'", ARRAY_A);
                             
                             foreach ($blockAll as  $blockB) {
                                 echo '<tr>';
                                 echo '<td>' . $blockB['all_blocks'] . '</td>'; 
                                 echo '<td>' . $uniqueId['block_cta_unique_id'] . '</td>'; 
-                                echo '<td>' . $blockB['block_url'] . '</td>'; 
-                                echo '<td>' . $blockB['block_text'] . '</td>'; 
+                                echo '<td>' . $blockB['block_cta_url'] . '</td>'; 
+                                echo '<td>' . $blockB['block_cta_text'] . '</td>'; 
                                 echo '</tr>';
                             }
                         }
